@@ -8,20 +8,36 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Manrope', 'sans-serif'],
+            },
+            colors: {
+              slate: {
+                850: '#1e293b',
+                900: '#0f172a',
+                950: '#020617',
+              }
+            }
+          }
+        }
+      }
+    </script>
     <style>
       body {
         font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
-        background-color: #000000; /* Updated to pure black */
+        background-color: #000000;
         color: #ffffff;
         overflow-x: hidden;
       }
       
-      /* --- PRO DETAILS: SCROLLBAR & SELECTION --- */
-      
       /* Custom Selection Color */
       ::selection {
-        background: rgba(168, 85, 247, 0.3); /* Purple tint */
+        background: rgba(168, 85, 247, 0.3);
         color: #ffffff;
         text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
       }
@@ -53,6 +69,19 @@
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
       }
 
+      /* Apple-style Noise Texture */
+      .bg-noise {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+        opacity: 0.035;
+        pointer-events: none;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      }
+
       /* Premium Text Shimmer Effect - Rainbow Gradient */
       .text-shimmer {
         background: linear-gradient(
@@ -72,15 +101,15 @@
         filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.3));
       }
 
-      /* Gold Shine Effect (White -> Gold -> White) */
+      /* Gold Shine Effect */
       .text-gold-shine {
         background: linear-gradient(
           110deg,
           #ffffff 0%,
-          #e2e8f0 30%,  /* Slate-200 */
-          #fbbf24 45%,  /* Amber-400 (Gold) */
-          #f59e0b 55%,  /* Amber-500 */
-          #e2e8f0 70%,  /* Slate-200 */
+          #e2e8f0 30%,
+          #fbbf24 45%,
+          #f59e0b 55%,
+          #e2e8f0 70%,
           #ffffff 100%
         );
         background-size: 200% auto;
@@ -91,16 +120,16 @@
         filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.25));
       }
       
-      /* --- NEW: Yellow/Amber Gradient --- */
+      /* Yellow/Amber Gradient */
       .text-gradient-yellow {
         background: linear-gradient(
           120deg,
-          #fef08a 0%,   /* Yellow-200 */
-          #facc15 20%,  /* Yellow-400 */
-          #eab308 40%,  /* Yellow-500 */
-          #ca8a04 60%,  /* Yellow-600 */
-          #facc15 80%,  /* Yellow-400 */
-          #fef08a 100%  /* Yellow-200 */
+          #fef08a 0%,
+          #facc15 20%,
+          #eab308 40%,
+          #ca8a04 60%,
+          #facc15 80%,
+          #fef08a 100%
         );
         background-size: 200% auto;
         -webkit-background-clip: text;
@@ -110,7 +139,7 @@
         filter: drop-shadow(0 0 10px rgba(234, 179, 8, 0.3));
       }
 
-      /* Standard Text Gradient for other elements */
+      /* Standard Text Gradient */
       .text-gradient {
         background: linear-gradient(to right, #c084fc, #f472b6, #fb923c);
         -webkit-background-clip: text;
@@ -135,75 +164,51 @@
         animation: sheen 4s infinite;
       }
 
-      /* White Text Glow */
-      .text-glow-white {
-        text-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.1);
-      }
-      
-      /* Gold Text Glow */
-      .text-glow-gold {
-        text-shadow: 0 0 20px rgba(234, 179, 8, 0.3);
-      }
-      
-      /* Red Text Glow (Error/Low Value) */
-      .text-glow-red {
-        text-shadow: 0 0 15px rgba(239, 68, 68, 0.6);
-      }
-
-      /* Green Text Glow (Success/High Value) */
-      .text-glow-green {
-        text-shadow: 0 0 20px rgba(52, 211, 153, 0.5);
-      }
+      /* Text Glows */
+      .text-glow-white { text-shadow: 0 0 20px rgba(255, 255, 255, 0.3), 0 0 10px rgba(255, 255, 255, 0.1); }
+      .text-glow-gold { text-shadow: 0 0 20px rgba(234, 179, 8, 0.3); }
+      .text-glow-red { text-shadow: 0 0 15px rgba(239, 68, 68, 0.6); }
+      .text-glow-green { text-shadow: 0 0 20px rgba(52, 211, 153, 0.5); }
 
       /* Alert Breathing Animation */
       @keyframes alert-breathe {
-        0%, 100% {
-          box-shadow: 0 0 0 rgba(249, 115, 60, 0);
-          border-color: rgba(249, 115, 60, 0.2);
-        }
-        50% {
-          box-shadow: 0 0 25px rgba(249, 115, 60, 0.3);
-          border-color: rgba(249, 115, 60, 0.8);
-        }
+        0%, 100% { box-shadow: 0 0 0 rgba(249, 115, 60, 0); border-color: rgba(249, 115, 60, 0.2); }
+        50% { box-shadow: 0 0 25px rgba(249, 115, 60, 0.3); border-color: rgba(249, 115, 60, 0.8); }
       }
 
       .animate-alert-breathe {
         animation: alert-breathe 3s ease-in-out infinite;
       }
 
-      /* Background Blob Animation */
-      @keyframes blob-float {
+      /* Liquid Drift Animation (Apple Style) */
+      @keyframes drift {
         0% { transform: translate(0px, 0px) scale(1); }
-        33% { transform: translate(30px, -50px) scale(1.1); }
-        66% { transform: translate(-20px, 20px) scale(0.9); }
+        33% { transform: translate(50px, -30px) scale(1.1); }
+        66% { transform: translate(-20px, 40px) scale(0.95); }
+        100% { transform: translate(0px, 0px) scale(1); }
+      }
+      
+      @keyframes drift-reverse {
+        0% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(-40px, 30px) scale(1.05); }
+        66% { transform: translate(30px, -50px) scale(0.9); }
         100% { transform: translate(0px, 0px) scale(1); }
       }
 
-      .animate-blob {
-        animation: blob-float 15s infinite ease-in-out; /* Slower animation for elegance */
+      .animate-drift {
+        animation: drift 20s infinite ease-in-out;
       }
       
-      .animation-delay-2000 {
-        animation-delay: 2s;
-      }
-      
-      .animation-delay-4000 {
-        animation-delay: 4s;
+      .animate-drift-slow {
+        animation: drift-reverse 25s infinite ease-in-out;
       }
 
-      /* Smooth Reveal Animation Classes */
-      .reveal-hidden {
-        opacity: 0;
-        transform: translateY(20px);
-        filter: blur(12px);
+      .animate-drift-slower {
+        animation: drift 30s infinite ease-in-out reverse;
       }
-      
-      .reveal-visible {
-        opacity: 1;
-        transform: translateY(0);
-        filter: blur(0);
-        transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
-      }
+
+      .reveal-hidden { opacity: 0; transform: translateY(20px); filter: blur(12px); }
+      .reveal-visible { opacity: 1; transform: translateY(0); filter: blur(0); transition: all 1.2s cubic-bezier(0.2, 0.8, 0.2, 1); }
 
       /* Border Shimmer */
       @keyframes border-shimmer {
@@ -217,32 +222,14 @@
         animation: border-shimmer 4s ease infinite;
       }
 
-      /* --- NEW: RAINBOW NEON ICON ANIMATION --- */
+      /* Rainbow Neon Icon Animation */
       @keyframes rainbow-neon {
-        0% {
-          color: #a855f7; /* Purple-500 */
-          filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.8)) drop-shadow(0 0 10px rgba(168, 85, 247, 0.4));
-        }
-        20% {
-          color: #ec4899; /* Pink-500 */
-          filter: drop-shadow(0 0 5px rgba(236, 72, 153, 0.8)) drop-shadow(0 0 10px rgba(236, 72, 153, 0.4));
-        }
-        40% {
-          color: #3b82f6; /* Blue-500 */
-          filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.8)) drop-shadow(0 0 10px rgba(59, 130, 246, 0.4));
-        }
-        60% {
-          color: #10b981; /* Emerald-500 */
-          filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.8)) drop-shadow(0 0 10px rgba(16, 185, 129, 0.4));
-        }
-        80% {
-          color: #f59e0b; /* Amber-500 */
-          filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.8)) drop-shadow(0 0 10px rgba(245, 158, 11, 0.4));
-        }
-        100% {
-          color: #a855f7; /* Purple-500 */
-          filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.8)) drop-shadow(0 0 10px rgba(168, 85, 247, 0.4));
-        }
+        0% { color: #a855f7; filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.8)) drop-shadow(0 0 10px rgba(168, 85, 247, 0.4)); }
+        20% { color: #ec4899; filter: drop-shadow(0 0 5px rgba(236, 72, 153, 0.8)) drop-shadow(0 0 10px rgba(236, 72, 153, 0.4)); }
+        40% { color: #3b82f6; filter: drop-shadow(0 0 5px rgba(59, 130, 246, 0.8)) drop-shadow(0 0 10px rgba(59, 130, 246, 0.4)); }
+        60% { color: #10b981; filter: drop-shadow(0 0 5px rgba(16, 185, 129, 0.8)) drop-shadow(0 0 10px rgba(16, 185, 129, 0.4)); }
+        80% { color: #f59e0b; filter: drop-shadow(0 0 5px rgba(245, 158, 11, 0.8)) drop-shadow(0 0 10px rgba(245, 158, 11, 0.4)); }
+        100% { color: #a855f7; filter: drop-shadow(0 0 5px rgba(168, 85, 247, 0.8)) drop-shadow(0 0 10px rgba(168, 85, 247, 0.4)); }
       }
 
       .icon-rainbow-neon {
@@ -252,10 +239,10 @@
   <script type="importmap">
 {
   "imports": {
-    "react/": "https://aistudiocdn.com/react@^19.2.1/",
-    "react": "https://aistudiocdn.com/react@^19.2.1",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.556.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/"
+    "react": "https://esm.sh/react@^19.2.1",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.1/",
+    "react/": "https://esm.sh/react@^19.2.1/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.559.0"
   }
 }
 </script>

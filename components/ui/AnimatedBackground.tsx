@@ -5,9 +5,12 @@ export const AnimatedBackground: React.FC = () => {
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
-      setMousePosition({
-        x: event.clientX,
-        y: event.clientY,
+      // Use requestAnimationFrame for smoother performance
+      requestAnimationFrame(() => {
+        setMousePosition({
+          x: event.clientX,
+          y: event.clientY,
+        });
       });
     };
 
@@ -19,62 +22,54 @@ export const AnimatedBackground: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none -z-10 bg-[#000000]">
-      {/* 
-        BASE GRADIENT: Deep Charcoal/Black 
-        Provides the "glossy dark" foundation.
-      */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-[#08080a] to-[#020203]" />
-
-      {/* 
-        AMBIENT GLOWS: "Soft volumetric light blobs with heavy gaussian blur"
-        Using deeper, more sophisticated colors (Indigo, Slate, Deep Purple) instead of bright pinks.
-      */}
+    <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none -z-10 bg-black">
+      {/* 1. Base Dark Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-[#050508] to-[#0a0a0f]" />
       
-      {/* Deep Indigo/Purple - Top Center - The main "Atmosphere" */}
-      <div 
-        className="absolute -top-[20%] left-[20%] w-[80vw] h-[80vw] bg-indigo-950/30 rounded-full mix-blend-screen filter blur-[150px] opacity-40 animate-blob"
-      />
+      {/* 2. Apple-style Mesh Gradients (The "Aurora") */}
+      {/* These are large, heavily blurred, moving blobs of color */}
+      
+      {/* Primary Purple Glow - Top Left */}
+      <div className="absolute -top-[10%] -left-[10%] w-[70vw] h-[70vw] rounded-full mix-blend-screen opacity-30 animate-drift blur-[100px]"
+           style={{ background: 'radial-gradient(circle, rgba(147, 51, 234, 0.6) 0%, rgba(88, 28, 135, 0) 70%)' }} />
 
-      {/* Subtle Cold Blue - Top Right - Adds the "Tech" feel */}
-      <div 
-        className="absolute top-[10%] -right-[20%] w-[60vw] h-[60vw] bg-slate-900/40 rounded-full mix-blend-screen filter blur-[120px] opacity-30 animate-blob animation-delay-2000"
-      />
+      {/* Deep Blue Depth - Top Right */}
+      <div className="absolute top-[0%] right-[0%] w-[60vw] h-[60vw] rounded-full mix-blend-screen opacity-20 animate-drift-slow blur-[120px]"
+           style={{ background: 'radial-gradient(circle, rgba(59, 130, 246, 0.5) 0%, rgba(30, 58, 138, 0) 70%)' }} />
 
-      {/* Deep Violet - Bottom Left - Anchors the design */}
-      <div 
-        className="absolute -bottom-[20%] -left-[10%] w-[70vw] h-[70vw] bg-purple-900/20 rounded-full mix-blend-screen filter blur-[150px] opacity-30 animate-blob animation-delay-4000"
-      />
+      {/* Pink/Magenta Accent - Bottom Left */}
+      <div className="absolute bottom-[0%] -left-[10%] w-[60vw] h-[60vw] rounded-full mix-blend-screen opacity-20 animate-drift-slower blur-[100px]"
+           style={{ background: 'radial-gradient(circle, rgba(236, 72, 153, 0.5) 0%, rgba(131, 24, 67, 0) 70%)' }} />
 
-      {/* 
-        MOUSE INTERACTION: "Glossy" spotlight
-        Instead of a color gradient, we use a very subtle white/blue gloss to simulate light hitting a dark surface.
-      */}
+      {/* Cyan/Green Hint - Bottom Right */}
+      <div className="absolute -bottom-[10%] right-[0%] w-[50vw] h-[50vw] rounded-full mix-blend-screen opacity-10 animate-drift blur-[80px]"
+           style={{ background: 'radial-gradient(circle, rgba(16, 185, 129, 0.4) 0%, rgba(6, 78, 59, 0) 70%)' }} />
+
+      {/* 3. Interactive Mouse Glow ("Volumetric Light") */}
       <div
-        className="absolute transition-transform duration-500 ease-out will-change-transform"
+        className="absolute transition-transform duration-1000 cubic-bezier(0.2, 0.8, 0.2, 1) will-change-transform"
         style={{
           left: 0,
           top: 0,
-          width: '1200px',
-          height: '1200px',
-          transform: `translate(${mousePosition.x - 600}px, ${mousePosition.y - 600}px)`,
-          background: 'radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 60%)',
-          filter: 'blur(60px)',
-        }}
-      />
-
-      {/* 
-        PRO DETAIL: CINEMATIC VIGNETTE 
-        Darkens the edges of the screen to focus the eye on the center content.
-      */}
-      <div 
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          background: 'radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.6) 120%)'
+          width: '800px',
+          height: '800px',
+          transform: `translate(${mousePosition.x - 400}px, ${mousePosition.y - 400}px)`,
+          background: 'radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.01) 40%, transparent 70%)',
+          filter: 'blur(40px)',
+          mixBlendMode: 'overlay', // This makes it brighten the colors behind it
         }}
       />
       
-      {/* NOISE TEXTURE REMOVED for clean, smooth aesthetic */}
+      {/* 4. Texture Overlay (Noise) - The key to the "Apple" look */}
+      <div className="bg-noise" />
+
+      {/* 5. Vignette to focus center */}
+      <div 
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle at center, transparent 20%, rgba(0,0,0,0.8) 100%)'
+        }}
+      />
     </div>
   );
 };

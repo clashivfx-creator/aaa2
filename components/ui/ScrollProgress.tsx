@@ -7,12 +7,11 @@ export const ScrollProgress: React.FC = () => {
     const handleScroll = () => {
       const totalScroll = document.documentElement.scrollTop;
       const windowHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-      const scroll = `${totalScroll / windowHeight}`;
+      const scroll = windowHeight > 0 ? totalScroll / windowHeight : 0;
       setScrollProgress(Number(scroll));
     };
 
     window.addEventListener('scroll', handleScroll);
-
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 

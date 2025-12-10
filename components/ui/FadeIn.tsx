@@ -26,7 +26,7 @@ export const FadeIn: React.FC<FadeInProps> = ({
       },
       {
         threshold: threshold,
-        rootMargin: "0px 0px -50px 0px", // Trigger slightly before bottom
+        rootMargin: "0px 0px -50px 0px",
       }
     );
 
@@ -41,13 +41,11 @@ export const FadeIn: React.FC<FadeInProps> = ({
     };
   }, [threshold]);
 
-  const style = { transitionDelay: `${delay}ms` };
-
   return (
     <div
       ref={ref}
       className={`reveal-hidden ${isVisible ? 'reveal-visible' : ''} ${className}`}
-      style={style}
+      style={{ transitionDelay: `${delay}ms` }}
     >
       {children}
     </div>

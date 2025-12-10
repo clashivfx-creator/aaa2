@@ -18,10 +18,8 @@ export const Button: React.FC<ButtonProps> = ({ children, fullWidth = false, cla
       `}
       {...props}
     >
-      {/* Hover Reveal Effect */}
       <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
       
-      {/* Auto-Sheen Animation (Pro Detail) */}
       <div className="absolute inset-0 w-full h-full">
         <div className="absolute top-0 left-0 w-20 h-full bg-white/30 blur-xl transform -skew-x-12 animate-sheen"></div>
       </div>

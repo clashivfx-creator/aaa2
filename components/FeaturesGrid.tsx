@@ -5,23 +5,22 @@ import {
   Users, 
   Palette, 
   Workflow, 
-  MessageSquare 
+  MessageSquare,
+  Crown // Added Crown icon for "Editor Reconocido"
 } from 'lucide-react';
 import { GlassCard } from './ui/GlassCard';
 import { FadeIn } from './ui/FadeIn';
 
-// Modified data structure: Storing the Component reference instead of the Element
-// to allow passing custom classes dynamically in the render loop.
 const features = [
   {
     Icon: Zap,
     title: "Edición Profesional",
-    desc: "VFX y ediciones profesionales."
+    desc: "Crea VFX y ediciones profesionales."
   },
   {
-    Icon: Layers,
-    title: "Composición Pro",
-    desc: "Integración 3D/2D con acabado cinematográfico."
+    Icon: Crown, // Changed icon to represent prestige
+    title: "Sé un Editor Reconocido",
+    desc: "Conviértete en el editor que todos conocen."
   },
   {
     Icon: Users,
@@ -36,7 +35,7 @@ const features = [
   {
     Icon: Workflow,
     title: "Inteligencia Artificial",
-    desc: "Videos con IA ultra realistas de calidad cine."
+    desc: "Crea videos con IA ultra realistas de calidad cine."
   },
   {
     Icon: MessageSquare,
@@ -47,16 +46,11 @@ const features = [
 
 export const FeaturesGrid: React.FC = () => {
   return (
-    <section className="py-32 px-4 relative">
+    <section className="py-16 px-4 relative">
       <div className="container mx-auto max-w-7xl">
-        <div className="text-center mb-24 flex flex-col items-center">
-          {/* 
-             HEADLINE STYLE UPDATE:
-             - Changed class to 'text-gradient-yellow' for the requested gold/yellow gradient look.
-             - Maintained FadeIn for smooth entry.
-          */}
+        <div className="text-center mb-12 flex flex-col items-center">
           <FadeIn>
-            <h2 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+            <h2 className="text-5xl md:text-7xl font-bold mb-4 tracking-tight">
               <span className="text-gradient-yellow inline-block">
                 INCLUYE:
               </span>
@@ -64,11 +58,12 @@ export const FeaturesGrid: React.FC = () => {
           </FadeIn>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {features.map((feature, index) => (
-            <FadeIn key={index} delay={index * 100 + 1000}>
+            // REMOVED + 1000ms delay. Now it starts immediately (index * 50)
+            <FadeIn key={index} delay={index * 50}>
               <GlassCard variant="glow-border" className="h-full group hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-500">
-                <div className="mb-6 relative w-16 h-16 flex items-center justify-center">
+                <div className="mb-4 relative w-16 h-16 flex items-center justify-center">
                   <div className="absolute inset-0 rounded-xl bg-white/5 blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 animate-pulse" />
                   <div className="relative z-10 w-14 h-14 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:border-white/20 transition-all duration-500 ease-out shadow-[inset_0_0_15px_rgba(255,255,255,0.05)]">
                      <feature.Icon 
@@ -78,7 +73,7 @@ export const FeaturesGrid: React.FC = () => {
                   </div>
                 </div>
 
-                <h3 className="text-xl font-bold text-white mb-3 tracking-tight group-hover:text-purple-100 transition-colors">
+                <h3 className="text-xl font-bold text-white mb-2 tracking-tight group-hover:text-purple-100 transition-colors">
                   {feature.title}
                 </h3>
                 <p className="text-gray-400 text-sm leading-relaxed font-light group-hover:text-gray-300 transition-colors">

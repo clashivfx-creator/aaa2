@@ -4,10 +4,10 @@ import { WarningSection } from './components/WarningSection';
 import { FeaturesGrid } from './components/FeaturesGrid';
 import { ProgramHighlights } from './components/ProgramHighlights';
 import { CreatorStory } from './components/CreatorStory';
+import { CreatorsSection } from './components/CreatorsSection'; // Import added
 import { Footer } from './components/Footer';
 import { AnimatedBackground } from './components/ui/AnimatedBackground';
 import { ScrollProgress } from './components/ui/ScrollProgress';
-import { FadeIn } from './components/ui/FadeIn';
 
 function App() {
   return (
@@ -26,6 +26,7 @@ function App() {
         <FeaturesGrid />
         <ProgramHighlights />
         <CreatorStory />
+        <CreatorsSection /> {/* Section added */}
       </main>
 
       <Footer />
