@@ -1,7 +1,18 @@
 import React from 'react';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, Instagram } from 'lucide-react';
 import { GlassCard } from './ui/GlassCard';
 import { FadeIn } from './ui/FadeIn';
+
+const TikTokIcon = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="currentColor" 
+    className={className}
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+  </svg>
+);
 
 export const CreatorsSection: React.FC = () => {
   return (
@@ -19,7 +30,7 @@ export const CreatorsSection: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 justify-center">
-          <FadeIn delay={100}>
+          <FadeIn delay={0}>
             <GlassCard className="relative overflow-hidden border-purple-500/20 max-w-4xl mx-auto">
               {/* Background Decoration */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
@@ -53,9 +64,33 @@ export const CreatorsSection: React.FC = () => {
                       </div>
                   </div>
                   
-                  <p className="text-gray-300 leading-relaxed font-light text-lg">
+                  <p className="text-gray-300 leading-relaxed font-light text-lg mb-6">
                     Dueño de una de las marcas de ropa más grandes de España. Un referente indiscutible en emprendimiento y creación de marca personal.
                   </p>
+
+                  {/* Social Links */}
+                  <div className="flex items-center justify-center md:justify-start gap-4">
+                    <a 
+                      href="https://www.instagram.com/danizvfx_/" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="group flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-[#E1306C]/10 hover:border-[#E1306C]/50 transition-all duration-300 transform hover:scale-105"
+                    >
+                      <Instagram className="w-5 h-5 text-gray-400 group-hover:text-[#E1306C] transition-colors" />
+                      <span className="text-sm font-semibold text-gray-300 group-hover:text-white">Instagram</span>
+                    </a>
+                    
+                    <a 
+                      href="https://www.tiktok.com/@danizvfx" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="group flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-[#00f2ea]/10 hover:border-[#00f2ea]/50 transition-all duration-300 transform hover:scale-105"
+                    >
+                      <TikTokIcon className="w-5 h-5 text-gray-400 group-hover:text-[#00f2ea] transition-colors" />
+                      <span className="text-sm font-semibold text-gray-300 group-hover:text-white">TikTok</span>
+                    </a>
+                  </div>
+
                 </div>
               </div>
             </GlassCard>

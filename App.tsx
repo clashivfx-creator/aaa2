@@ -4,16 +4,18 @@ import { WarningSection } from './components/WarningSection';
 import { FeaturesGrid } from './components/FeaturesGrid';
 import { ProgramHighlights } from './components/ProgramHighlights';
 import { CreatorStory } from './components/CreatorStory';
-import { CreatorsSection } from './components/CreatorsSection'; // Import added
+import { CreatorsSection } from './components/CreatorsSection'; 
 import { Footer } from './components/Footer';
 import { AnimatedBackground } from './components/ui/AnimatedBackground';
 import { ScrollProgress } from './components/ui/ScrollProgress';
+import { FloatingSocials } from './components/ui/FloatingSocials';
 
 function App() {
   return (
     <div className="min-h-screen text-white relative">
       <AnimatedBackground />
       <ScrollProgress />
+      <FloatingSocials />
       
       {/* Navbar overlay with Logo */}
       <nav className="fixed top-0 w-full z-50 px-8 py-6 flex justify-between items-center mix-blend-difference pointer-events-none">
@@ -26,7 +28,7 @@ function App() {
         <FeaturesGrid />
         <ProgramHighlights />
         <CreatorStory />
-        <CreatorsSection /> {/* Section added */}
+        <CreatorsSection /> 
       </main>
 
       <Footer />

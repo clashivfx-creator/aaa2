@@ -17,7 +17,7 @@ export const ProgramHighlights: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             
-            <FadeIn delay={100} className="h-full">
+            <FadeIn delay={0} className="h-full">
               <GlassCard hoverEffect className="flex flex-col items-center text-center py-8 px-6 h-full group">
                   <div className="mb-6 relative w-16 h-16 flex items-center justify-center">
                     <div className="absolute inset-0 rounded-xl bg-white/5 blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 animate-pulse" />
@@ -31,7 +31,7 @@ export const ProgramHighlights: React.FC = () => {
               </GlassCard>
             </FadeIn>
 
-            <FadeIn delay={200} className="h-full">
+            <FadeIn delay={50} className="h-full">
               <GlassCard hoverEffect className="flex flex-col items-center text-center py-8 px-6 border-purple-500/20 bg-gradient-to-b from-white/5 to-transparent h-full group">
                   <div className="mb-6 relative w-16 h-16 flex items-center justify-center">
                     <div className="absolute inset-0 rounded-xl bg-white/5 blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 animate-pulse" />
@@ -45,7 +45,7 @@ export const ProgramHighlights: React.FC = () => {
               </GlassCard>
             </FadeIn>
 
-            <FadeIn delay={300} className="h-full">
+            <FadeIn delay={100} className="h-full">
               <GlassCard hoverEffect className="flex flex-col items-center text-center py-8 px-6 h-full group">
                   <div className="mb-6 relative w-16 h-16 flex items-center justify-center">
                     <div className="absolute inset-0 rounded-xl bg-white/5 blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 animate-pulse" />
@@ -59,7 +59,7 @@ export const ProgramHighlights: React.FC = () => {
               </GlassCard>
             </FadeIn>
 
-            <FadeIn delay={400} className="h-full">
+            <FadeIn delay={150} className="h-full">
               <GlassCard hoverEffect className="flex flex-col items-center text-center py-8 px-6 h-full group">
                   <div className="mb-6 relative w-16 h-16 flex items-center justify-center">
                     <div className="absolute inset-0 rounded-xl bg-white/5 blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 animate-pulse" />
