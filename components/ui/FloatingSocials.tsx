@@ -15,16 +15,16 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 
 export const FloatingSocials: React.FC = () => {
   return (
-    <div className="fixed bottom-8 right-8 z-50 flex flex-col gap-4">
+    <div className="fixed bottom-4 right-4 md:bottom-8 md:right-8 z-50 flex flex-col gap-3 md:gap-4">
        {/* Instagram */}
        <a 
          href="https://www.instagram.com/clashivfx/" 
          target="_blank" 
          rel="noopener noreferrer"
-         className="w-16 h-16 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:bg-gradient-to-tr hover:from-orange-500 hover:to-purple-600 hover:border-purple-500/50 shadow-lg hover:shadow-purple-500/40 group"
+         className="w-11 h-11 md:w-16 md:h-16 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:bg-gradient-to-tr hover:from-orange-500 hover:to-purple-600 hover:border-purple-500/50 shadow-lg hover:shadow-purple-500/40 group"
          aria-label="Instagram"
        >
-         <Instagram className="w-8 h-8 group-hover:text-white" />
+         <Instagram className="w-5 h-5 md:w-8 md:h-8 group-hover:text-white" />
        </a>
 
        {/* TikTok */}
@@ -32,10 +32,10 @@ export const FloatingSocials: React.FC = () => {
          href="https://www.tiktok.com/@clashivfx" 
          target="_blank" 
          rel="noopener noreferrer"
-         className="w-16 h-16 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:bg-black hover:border-[#00f2ea]/50 shadow-lg hover:shadow-[#00f2ea]/40 group"
+         className="w-11 h-11 md:w-16 md:h-16 rounded-full bg-black/40 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:bg-black hover:border-[#00f2ea]/50 shadow-lg hover:shadow-[#00f2ea]/40 group"
          aria-label="TikTok"
        >
-         <TikTokIcon className="w-8 h-8 group-hover:text-[#00f2ea]" />
+         <TikTokIcon className="w-5 h-5 md:w-8 md:h-8 group-hover:text-[#00f2ea]" />
        </a>
 
        {/* Discord - Neon Blue */}
@@ -43,10 +43,10 @@ export const FloatingSocials: React.FC = () => {
          href="https://discord.gg/zEcFPBqy6s" 
          target="_blank" 
          rel="noopener noreferrer"
-         className="w-16 h-16 rounded-full bg-black/40 backdrop-blur-md border border-[#5865F2]/30 flex items-center justify-center text-[#5865F2] transition-all duration-300 hover:scale-110 hover:bg-[#5865F2] hover:text-white hover:border-[#5865F2]/50 shadow-[0_0_15px_rgba(88,101,242,0.15)] hover:shadow-[0_0_25px_rgba(88,101,242,0.5)] group"
+         className="w-11 h-11 md:w-16 md:h-16 rounded-full bg-black/40 backdrop-blur-md border border-[#5865F2]/30 flex items-center justify-center text-[#5865F2] transition-all duration-300 hover:scale-110 hover:bg-[#5865F2] hover:text-white hover:border-[#5865F2]/50 shadow-[0_0_15px_rgba(88,101,242,0.15)] hover:shadow-[0_0_25px_rgba(88,101,242,0.5)] group"
          aria-label="Discord"
        >
-         <DiscordIcon className="w-9 h-9" />
+         <DiscordIcon className="w-5 h-5 md:w-9 md:h-9" />
        </a>
     </div>
   );

@@ -32,7 +32,7 @@ export const ProgramHighlights: React.FC = () => {
             </FadeIn>
 
             <FadeIn delay={50} className="h-full">
-              <GlassCard hoverEffect className="flex flex-col items-center text-center py-8 px-6 border-purple-500/20 bg-gradient-to-b from-white/5 to-transparent h-full group">
+              <GlassCard hoverEffect className="flex flex-col items-center text-center py-8 px-6 h-full group">
                   <div className="mb-6 relative w-16 h-16 flex items-center justify-center">
                     <div className="absolute inset-0 rounded-xl bg-white/5 blur-xl opacity-0 group-hover:opacity-30 transition-opacity duration-500 animate-pulse" />
                     <div className="relative z-10 w-14 h-14 rounded-xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 flex items-center justify-center group-hover:scale-110 group-hover:border-white/20 transition-all duration-500 ease-out shadow-[inset_0_0_15px_rgba(255,255,255,0.05)]">
