@@ -8,8 +8,15 @@ export const Hero: React.FC = () => {
     <section className="relative flex items-center justify-center pt-24 pb-8 overflow-hidden">
       
       <div className="relative z-10 container mx-auto px-4 text-center max-w-5xl">
-        
-        {/* Badge removed completely */}
+        <FadeIn delay={0}>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-purple-500/30 bg-purple-900/10 backdrop-blur-md mb-6 shadow-[0_0_15px_rgba(168,85,247,0.15)] group hover:border-purple-400/50 transition-all cursor-default">
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-purple-500 shadow-[0_0_10px_rgba(168,85,247,0.8)]"></span>
+            </span>
+            <span className="text-xs font-bold tracking-widest text-purple-100 uppercase drop-shadow-sm">Formación exclusiva para editores</span>
+          </div>
+        </FadeIn>
 
         <div className="mb-6">
           <h1 className="text-6xl md:text-8xl lg:text-9xl font-bold tracking-tighter leading-[0.9]">
