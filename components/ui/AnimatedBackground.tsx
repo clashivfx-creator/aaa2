@@ -2,43 +2,59 @@ import React from 'react';
 
 export const AnimatedBackground: React.FC = () => {
   return (
-    <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none -z-10 bg-[#050508]">
-      {/* 
-        LIQUID MESH GRADIENT SYSTEM 
-        Uses CSS animations to move large blurred blobs around, changing their scale and border-radius 
-        to create a fluid, warping effect.
-      */}
+    <div className="fixed inset-0 w-full h-full overflow-hidden pointer-events-none -z-10 bg-black">
+      {/* 1. Base Dark Gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-[#050508] to-[#0a0a0f]" />
       
-      <div className="absolute inset-0 opacity-40">
-        {/* Blob 1: Purple - Top Left */}
-        <div 
-          className="absolute top-0 -left-40 w-[70vh] h-[70vh] bg-purple-600 rounded-full mix-blend-screen blur-[120px] opacity-40 animate-blob"
-        />
-        
-        {/* Blob 2: Blue - Top Right (Delayed) */}
-        <div 
-          className="absolute top-0 -right-40 w-[70vh] h-[70vh] bg-blue-600 rounded-full mix-blend-screen blur-[120px] opacity-40 animate-blob animation-delay-2000"
-        />
-        
-        {/* Blob 3: Pink - Bottom Left (Delayed more) */}
-        <div 
-          className="absolute -bottom-40 -left-40 w-[70vh] h-[70vh] bg-pink-600 rounded-full mix-blend-screen blur-[120px] opacity-40 animate-blob animation-delay-4000"
-        />
+      {/* 2. Apple-style Mesh Gradients (The "Aurora") */}
+      {/* These are large, heavily blurred, moving blobs of color with increased autonomous movement */}
+      
+      {/* Primary Purple Glow - Top Left */}
+      <div className="absolute -top-[10%] -left-[10%] w-[80vw] h-[80vw] rounded-full mix-blend-screen opacity-30 animate-blob blur-[100px]"
+           style={{ background: 'radial-gradient(circle, rgba(147, 51, 234, 0.5) 0%, rgba(88, 28, 135, 0) 70%)' }} />
 
-        {/* Blob 4: Orange/Amber - Bottom Center (Floating up) */}
-        <div 
-          className="absolute -bottom-20 left-[40%] w-[60vh] h-[60vh] bg-orange-500/30 rounded-full mix-blend-screen blur-[100px] opacity-30 animate-float-center"
+      {/* Deep Blue Depth - Top Right */}
+      <div className="absolute top-[0%] right-[0%] w-[70vw] h-[70vw] rounded-full mix-blend-screen opacity-20 animate-blob animation-delay-2000 blur-[120px]"
+           style={{ 
+             background: 'radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(30, 58, 138, 0) 70%)',
+             animationDirection: 'reverse'
+           }} />
+
+      {/* Pink/Magenta Accent - Bottom Left */}
+      <div className="absolute bottom-[0%] -left-[10%] w-[70vw] h-[70vw] rounded-full mix-blend-screen opacity-20 animate-blob animation-delay-4000 blur-[100px]"
+           style={{ 
+             background: 'radial-gradient(circle, rgba(236, 72, 153, 0.4) 0%, rgba(131, 24, 67, 0) 70%)',
+             animationDuration: '25s'
+           }} />
+
+      {/* Cyan/Green Hint - Bottom Right */}
+      <div className="absolute -bottom-[10%] right-[0%] w-[60vw] h-[60vw] rounded-full mix-blend-screen opacity-10 animate-blob blur-[80px]"
+           style={{ 
+             background: 'radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, rgba(6, 78, 59, 0) 70%)',
+             animationDirection: 'reverse',
+             animationDuration: '22s'
+           }} />
+
+      {/* 3. Center Floating Light (Replaces Mouse Interaction) */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div
+          className="w-[1000px] h-[1000px] rounded-full animate-float-center"
+          style={{
+            background: 'radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 40%, transparent 70%)',
+            filter: 'blur(50px)',
+            mixBlendMode: 'overlay',
+          }}
         />
       </div>
-
-      {/* Glass Overlay Texture - Film Grain */}
-      <div className="absolute inset-0 bg-noise opacity-[0.03] mix-blend-overlay"></div>
       
-      {/* Dark Vignette to keep focus in center */}
+      {/* 4. Texture Overlay (Noise) */}
+      <div className="bg-noise absolute inset-0 w-full h-full opacity-[0.035] pointer-events-none z-[-1]" />
+
+      {/* 5. Vignette to focus center */}
       <div 
-        className="absolute inset-0"
+        className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(circle at center, transparent 0%, #000000 120%)'
+          background: 'radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.85) 100%)'
         }}
       />
     </div>

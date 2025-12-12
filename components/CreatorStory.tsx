@@ -14,20 +14,27 @@ export const CreatorStory: React.FC = () => {
             </h2>
           </FadeIn>
           
-          <div className="space-y-6 text-gray-300 text-xl leading-relaxed mb-8 font-light max-w-3xl mx-auto">
+          <div className="space-y-6 mb-8 max-w-3xl mx-auto">
             <FadeIn delay={50}>
-              <p>
-                Antes cobraba <span className="text-red-500 font-bold text-glow-red">$200</span> dólares por mes editando muchos videos que no me pagaban lo suficiente. Ahora, con solo 1 o 2 proyectos al mes, estoy cobrando más de <span className="text-emerald-400 font-bold text-glow-green">$3,000 dólares</span>, hasta <span className="text-yellow-400 font-bold text-glow-gold">$5,000</span> si el proyecto lo amerita.
-              </p>
+              <div className="glass-panel rounded-2xl p-8 md:p-10 border border-white/10 shadow-2xl relative overflow-hidden group hover:bg-white/5 transition-all duration-500">
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-orange-500/5 opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                <p className="text-gray-300 text-xl md:text-2xl leading-relaxed font-light relative z-10">
+                  Antes cobraba <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-red-600 font-bold text-2xl md:text-3xl drop-shadow-sm">$200</span> por mes editando muchos videos que no me pagaban lo suficiente. Ahora, con solo 1 o 2 proyectos al mes, estoy cobrando más de <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-emerald-500 font-bold text-2xl md:text-3xl drop-shadow-[0_0_10px_rgba(16,185,129,0.3)]">$3,000</span>, hasta <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-500 font-bold text-2xl md:text-3xl drop-shadow-[0_0_10px_rgba(245,158,11,0.3)]">$5,000</span> si el proyecto lo amerita.
+                </p>
+              </div>
             </FadeIn>
+
             <FadeIn delay={100}>
-              <p>
-                Hoy, he trabajado con <strong className="text-white font-medium text-2xl block mt-2 drop-shadow-[0_0_10px_rgba(255,255,255,0.15)]">Rauw Alejandro, Emilia Mernes, Duki, Khea, Kun Agüero, YSY A, Thiago PZK, Lit Killah, y muchos más.</strong>
+              <p className="text-xl text-gray-400 font-light mt-8">
+                Hoy, he trabajado con 
+                <span className="block mt-4 text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#bf953f] via-[#fcf6ba] to-[#b38728] bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(234,179,8,0.6)] leading-relaxed filter">
+                  Rauw Alejandro, Emilia Mernes, Duki, Khea, Kun Agüero, YSY A, Thiago PZK, Lit Killah, y muchos más.
+                </span>
               </p>
             </FadeIn>
 
             <FadeIn delay={150}>
-              <div className="mt-6 p-4 bg-purple-900/20 border border-purple-500/30 rounded-2xl backdrop-blur-sm inline-block shadow-[0_0_30px_-10px_rgba(168,85,247,0.2)]">
+              <div className="mt-8 p-4 bg-purple-900/20 border border-purple-500/30 rounded-2xl backdrop-blur-sm inline-block shadow-[0_0_30px_-10px_rgba(168,85,247,0.2)]">
                 <p className="text-purple-200 italic text-xl font-medium">
                   "Trabajando con los mejores de la industria."
                 </p>
