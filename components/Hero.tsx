@@ -5,7 +5,7 @@ import { LetterStagger } from './ui/LetterStagger';
 
 export const Hero: React.FC = () => {
   return (
-    <section className="relative flex items-center justify-center pt-44 pb-8 overflow-hidden">
+    <section className="relative flex items-center justify-center pt-32 pb-8 overflow-hidden">
       
       <div className="relative z-10 container mx-auto px-4 text-center max-w-5xl">
         <FadeIn delay={0}>
@@ -26,8 +26,8 @@ export const Hero: React.FC = () => {
             
             <FadeIn delay={500}>
               <div className="block transform hover:scale-[1.02] transition-transform duration-500">
-                <span className="text-shimmer inline-block">
-                   Top 1% de Editores
+                <span className="inline-block text-shimmer">
+                  Top 1% de Editores
                 </span>
               </div>
             </FadeIn>
@@ -41,10 +41,11 @@ export const Hero: React.FC = () => {
         </FadeIn>
 
         <FadeIn delay={1000}>
-          <div className="flex flex-col items-center gap-8">
+          <div className="flex flex-col items-center gap-6">
             <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto justify-center">
               <a href="https://e08ff1-xx.myshopify.com/products/formacion-1-a-1" target="_blank" rel="noopener noreferrer" className="w-full md:w-auto">
-                <Button className="w-full md:w-auto text-lg px-12 py-5 shadow-[0_0_40px_-5px_rgba(147,51,234,0.3)] border border-white/10 animate-button-attention-hero">
+                {/* Updated Button: Smaller on mobile (text-sm, px-6, py-3), Larger on desktop (md:text-xl, md:px-10, md:py-5) */}
+                <Button className="w-full md:w-auto text-sm md:text-xl px-6 py-3 md:px-10 md:py-5 animate-pulse-glow hover:animate-none shadow-[0_0_40px_-5px_rgba(147,51,234,0.3)] border border-white/10">
                   ENTRAR A LA FORMACION
                 </Button>
               </a>
