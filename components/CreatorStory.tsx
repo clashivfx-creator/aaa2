@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from './ui/Button';
 import { FadeIn } from './ui/FadeIn';
-import { GlassCard } from './ui/GlassCard';
 
 export const CreatorStory: React.FC = () => {
   return (
@@ -10,36 +9,25 @@ export const CreatorStory: React.FC = () => {
         
         <div className="flex flex-col items-center">
           <FadeIn>
-            <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight tracking-tight text-glow-white">
+            <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight tracking-tight text-glow-white">
               De editar gratis a trabajar con <span className="text-gradient drop-shadow-md">los mejores</span>
             </h2>
           </FadeIn>
           
-          <div className="space-y-8 text-gray-300 text-xl leading-relaxed mb-10 font-light max-w-3xl mx-auto">
+          <div className="space-y-6 text-gray-300 text-xl leading-relaxed mb-8 font-light max-w-3xl mx-auto">
             <FadeIn delay={50}>
-               {/* Liquid Glass Box */}
-              <GlassCard className="!bg-white/5 !border-white/10 relative overflow-hidden group hover:!bg-white/10 transition-all duration-500 !p-8 shadow-[0_0_40px_-10px_rgba(168,85,247,0.15)]">
-                  {/* Fluid background effect */}
-                  <div className="absolute top-0 right-0 w-full h-full bg-gradient-to-bl from-purple-500/10 via-transparent to-pink-500/10 opacity-60 group-hover:opacity-80 transition-opacity duration-700"></div>
-                  <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl group-hover:bg-purple-500/30 transition-colors duration-700"></div>
-                  
-                  <p className="relative z-10 text-lg md:text-xl">
-                    Antes cobraba <span className="text-red-500 font-bold text-glow-red">$200</span> dólares por mes editando muchos videos que no me pagaban lo suficiente. Ahora, con solo 1 o 2 proyectos al mes, estoy cobrando más de <span className="text-emerald-400 font-bold text-glow-green">$3,000</span>, hasta <span className="text-yellow-400 font-bold text-glow-gold">$5,000</span> si el proyecto lo amerita.
-                  </p>
-              </GlassCard>
+              <p>
+                Antes cobraba <span className="text-red-500 font-bold text-glow-red">$200</span> dólares por mes editando muchos videos que no me pagaban lo suficiente. Ahora, con solo 1 o 2 proyectos al mes, estoy cobrando más de <span className="text-emerald-400 font-bold text-glow-green">$3,000 dólares</span>, hasta <span className="text-yellow-400 font-bold text-glow-gold">$5,000</span> si el proyecto lo amerita.
+              </p>
             </FadeIn>
-            
             <FadeIn delay={100}>
-              <div className="px-4 mt-8">
-                <p className="mb-3 text-gray-400 text-lg">Hoy, he trabajado con:</p>
-                <strong className="text-artist-highlight font-bold text-2xl md:text-3xl block leading-tight pb-2">
-                  Rauw Alejandro, Emilia Mernes, Duki, Khea, Kun Agüero, YSY A, Thiago PZK, Lit Killah, y muchos más.
-                </strong>
-              </div>
+              <p>
+                Hoy, he trabajado con <strong className="text-white font-medium text-2xl block mt-2 drop-shadow-[0_0_10px_rgba(255,255,255,0.15)]">Rauw Alejandro, Emilia Mernes, Duki, Khea, Kun Agüero, YSY A, Thiago PZK, Lit Killah, y muchos más.</strong>
+              </p>
             </FadeIn>
 
             <FadeIn delay={150}>
-              <div className="mt-8 p-4 bg-purple-900/20 border border-purple-500/30 rounded-2xl backdrop-blur-sm inline-block shadow-[0_0_30px_-10px_rgba(168,85,247,0.2)]">
+              <div className="mt-6 p-4 bg-purple-900/20 border border-purple-500/30 rounded-2xl backdrop-blur-sm inline-block shadow-[0_0_30px_-10px_rgba(168,85,247,0.2)]">
                 <p className="text-purple-200 italic text-xl font-medium">
                   "Trabajando con los mejores de la industria."
                 </p>
