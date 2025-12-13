@@ -17,8 +17,9 @@ export const AnimatedBackground: React.FC = () => {
     const CONFIG = {
       baseColor: '#050505',
       particleCount: window.innerWidth < 768 ? 60 : 140, 
-      mouseRange: 250, // Range for mouse illumination
-      scrollFactor: 0.5, // Parallax effect speed relative to scroll
+      mouseRange: 250, 
+      // Fixed scroll synchronization (0.8 provides a tight feel while maintaining slight depth)
+      scrollFactor: 0.8, 
     };
 
     // --- State ---
@@ -41,15 +42,15 @@ export const AnimatedBackground: React.FC = () => {
         // Very slow organic movement
         this.vx = (Math.random() - 0.5) * 0.05;
         this.vy = (Math.random() - 0.5) * 0.05;
-        // Increased intensity for "Stronger light diffusion" (0.06 -> 0.12)
-        this.color = `hsla(${hue}, 85%, 60%, 0.12)`;
+        // Increased intensity (was 0.12) for stronger light diffusion
+        this.color = `hsla(${hue}, 85%, 60%, 0.16)`;
       }
 
       update() {
         this.x += this.vx;
         this.y += this.vy;
         
-        // Gentle bounce to keep them on screen
+        // Gentle bounce
         if (this.x < 0 || this.x > width) this.vx *= -1;
         if (this.y < 0 || this.y > height) this.vy *= -1;
       }
@@ -74,47 +75,45 @@ export const AnimatedBackground: React.FC = () => {
       
       constructor() {
         this.baseX = Math.random() * width;
-        this.baseY = Math.random() * height * 2; // Distribute over 2x height for scrolling buffer
-        this.size = Math.random() * 1.5 + 0.5; // Micro dots
-        // Violet, Cyan, Warm hues
+        this.baseY = Math.random() * height * 2; // Distribute over 2x height
+        // Increased particle size slightly (Range: 1.0 - 3.0)
+        this.size = Math.random() * 2 + 1; 
+        
         const hues = [260, 30, 190]; 
         this.baseHue = hues[Math.floor(Math.random() * hues.length)] + (Math.random() * 40 - 20);
       }
 
       draw() {
-        // Calculate Y position based on scroll (Wrap around for infinite feel)
-        // (baseY - scrollY * speed) modulo height
+        // Strict, lag-free scroll synchronization calculated every frame
         let screenY = (this.baseY - scrollY * CONFIG.scrollFactor) % height;
         if (screenY < 0) screenY += height;
         
         const screenX = this.baseX;
 
-        // Interaction Logic
         const dx = mouse.x - screenX;
         const dy = mouse.y - screenY;
         const dist = Math.sqrt(dx * dx + dy * dy);
         
-        // Activity Check: Is scrolling or Mouse nearby?
-        const isScrolling = Math.abs(scrollVelocity) > 2;
+        // Lower threshold slightly for frame-based velocity calculation
+        const isScrolling = Math.abs(scrollVelocity) > 1;
         const isHovered = dist < CONFIG.mouseRange;
         
-        let color = 'rgba(255, 255, 255, 0.15)'; // Idle state: Clean white/gray
+        // Base color slightly more visible
+        let color = 'rgba(255, 255, 255, 0.2)'; 
         let size = this.size;
         let glow = false;
 
         if (isScrolling || isHovered) {
-          // Calculate intensity
           let intensity = 0;
           
           if (isHovered) {
             intensity = Math.max(intensity, 1 - dist / CONFIG.mouseRange);
           }
           if (isScrolling) {
-            intensity = Math.max(intensity, Math.min(Math.abs(scrollVelocity) / 20, 0.8));
+            intensity = Math.max(intensity, Math.min(Math.abs(scrollVelocity) / 15, 0.8));
           }
 
-          // Interpolate to color
-          const alpha = 0.2 + intensity * 0.6;
+          const alpha = 0.3 + intensity * 0.7;
           color = `hsla(${this.baseHue}, 80%, 70%, ${alpha})`;
           
           if (isHovered) {
@@ -125,7 +124,7 @@ export const AnimatedBackground: React.FC = () => {
         ctx!.fillStyle = color;
         
         if (glow) {
-            ctx!.shadowBlur = 10;
+            ctx!.shadowBlur = 12;
             ctx!.shadowColor = color;
         } else {
             ctx!.shadowBlur = 0;
@@ -135,7 +134,7 @@ export const AnimatedBackground: React.FC = () => {
         ctx!.arc(screenX, screenY, size, 0, Math.PI * 2);
         ctx!.fill();
         
-        ctx!.shadowBlur = 0; // Reset
+        ctx!.shadowBlur = 0; 
       }
     }
 
@@ -147,12 +146,11 @@ export const AnimatedBackground: React.FC = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
       
-      // Fixed positions for atmosphere to ensure balanced color
       orbs = [
-        new Orb(260, 0.2, 0.2), // Violet top-left
-        new Orb(30, 0.8, 0.3),  // Warm top-right
-        new Orb(190, 0.5, 0.8), // Cyan bottom
-        new Orb(280, 0.9, 0.9)  // Violet bottom-right
+        new Orb(260, 0.2, 0.2), 
+        new Orb(30, 0.8, 0.3),  
+        new Orb(190, 0.5, 0.8), 
+        new Orb(280, 0.9, 0.9)  
       ];
 
       particles = [];
@@ -165,49 +163,39 @@ export const AnimatedBackground: React.FC = () => {
     const animate = () => {
       if (!ctx) return;
       
+      // CRITICAL: Read scroll position directly in the loop to eliminate event listener latency
+      const currentScrollY = window.scrollY;
+      scrollVelocity = currentScrollY - lastScrollY;
+      lastScrollY = currentScrollY;
+      scrollY = currentScrollY;
+      
       // Clear
       ctx.fillStyle = CONFIG.baseColor;
       ctx.fillRect(0, 0, width, height);
 
-      // 1. Draw Ambient Atmosphere
+      // Draw Atmosphere
       orbs.forEach(orb => {
         orb.update();
         orb.draw();
       });
 
-      // 2. Draw Particles (No physics updates, just draw at scroll pos)
+      // Draw Particles
       particles.forEach(p => {
         p.draw();
       });
 
-      // Decay scroll velocity for color transition
-      scrollVelocity *= 0.9;
-      
       requestAnimationFrame(animate);
     };
 
     // --- Event Listeners ---
-    
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      scrollVelocity = currentScrollY - lastScrollY;
-      lastScrollY = currentScrollY;
-      scrollY = currentScrollY;
-    };
-
-    const handleResize = () => {
-      init();
-    };
+    const handleResize = () => init();
 
     const handleMouseMove = (e: MouseEvent) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
     };
 
-    // Mobile optimization: No touch tracking needed for this effect
-    
     window.addEventListener('resize', handleResize);
-    window.addEventListener('scroll', handleScroll);
     window.addEventListener('mousemove', handleMouseMove);
 
     init();
@@ -215,7 +203,6 @@ export const AnimatedBackground: React.FC = () => {
 
     return () => {
       window.removeEventListener('resize', handleResize);
-      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
