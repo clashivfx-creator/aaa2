@@ -14,18 +14,22 @@ export const AnimatedBackground: React.FC = () => {
     let height = canvas.height = window.innerHeight;
 
     // --- Configuration ---
-    // Deep dark background (Pure Black for max contrast with glow)
+    // Deep dark background
     const BG_COLOR = '#000000';
     
-    // Apple-style glow colors (Violet, Orange, Cyan) - Even Lower saturation/opacity for background
+    // Requested Colors: Violet, Orange, Celeste
+    // Subtle atmospheric lights
     const ORB_COLORS = [
-      { r: 80, g: 40, b: 160 }, // Deep Violet
-      { r: 160, g: 60, b: 40 }, // Deep Orange
-      { r: 40, g: 120, b: 160 } // Deep Cyan
+      { r: 139, g: 92, b: 246 },  // Violet
+      { r: 249, g: 115, b: 22 },  // Orange
+      { r: 56, g: 189, b: 248 }   // Celeste (Light Blue)
     ];
 
     // Particle settings
-    const PARTICLE_COUNT = window.innerWidth < 768 ? 60 : 140;
+    // CRITICAL CHANGE: 0 particles on mobile (< 768px)
+    const isMobile = window.innerWidth < 768;
+    const PARTICLE_COUNT = isMobile ? 0 : 100;
+    
     const MOUSE_RANGE = 200;
 
     // --- State ---
@@ -46,23 +50,23 @@ export const AnimatedBackground: React.FC = () => {
       color: string;
 
       constructor(colorIdx: number) {
-        this.radius = Math.min(width, height) * 0.5; // Large soft blobs
+        this.radius = Math.min(width, height) * 0.6; // Slightly larger for better blending
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        // Very slow, organic movement
-        this.vx = (Math.random() - 0.5) * 0.15;
-        this.vy = (Math.random() - 0.5) * 0.15;
+        // Slow, drifting movement
+        this.vx = (Math.random() - 0.5) * 0.2;
+        this.vy = (Math.random() - 0.5) * 0.2;
         
         const c = ORB_COLORS[colorIdx % ORB_COLORS.length];
-        // Extremely low opacity for "diffused light" (Darker than before)
-        this.color = `rgba(${c.r}, ${c.g}, ${c.b}, 0.02)`; 
+        // 5% Opacity as requested
+        this.color = `rgba(${c.r}, ${c.g}, ${c.b}, 0.05)`; 
       }
 
       update() {
         this.x += this.vx;
         this.y += this.vy;
 
-        // Gentle bounce
+        // Gentle bounce off screen edges
         if (this.x < -this.radius) this.vx = Math.abs(this.vx);
         if (this.x > width + this.radius) this.vx = -Math.abs(this.vx);
         if (this.y < -this.radius) this.vy = Math.abs(this.vy);
@@ -70,8 +74,7 @@ export const AnimatedBackground: React.FC = () => {
       }
 
       draw() {
-        // No glow for background orbs to save perf
-        ctx!.shadowBlur = 0;
+        // Soft gradient for the "light" effect
         const g = ctx!.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
         g.addColorStop(0, this.color);
         g.addColorStop(1, 'rgba(0,0,0,0)');
@@ -83,7 +86,7 @@ export const AnimatedBackground: React.FC = () => {
       }
     }
 
-    // VFX Particles (Field)
+    // VFX Particles (The "bolitas")
     class Particle {
       x: number;
       y: number;
@@ -102,15 +105,12 @@ export const AnimatedBackground: React.FC = () => {
         this.friction = 0.94; 
         this.size = Math.random() * 1.5 + 0.5; 
         this.type = Math.random() > 0.9 ? 'cross' : 'dot';
-        // Assign a random neon color hue to each particle
         this.baseHue = Math.random() * 360; 
       }
 
       update() {
-        // 1. Scroll Influence
         this.vy += scrollVelocity * 0.02;
 
-        // 2. Interaction
         const dx = mouse.x - this.x;
         const dy = mouse.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -118,21 +118,17 @@ export const AnimatedBackground: React.FC = () => {
         if (dist < MOUSE_RANGE) {
            const force = (MOUSE_RANGE - dist) / MOUSE_RANGE;
            const angle = Math.atan2(dy, dx);
-           const push = force * 0.8; // Stronger push
+           const push = force * 0.8;
            
            this.vx -= Math.cos(angle) * push;
            this.vy -= Math.sin(angle) * push;
         }
 
-        // 3. Physics
         this.x += this.vx;
         this.y += this.vy;
-
-        // 4. Friction
         this.vx *= this.friction;
         this.vy *= this.friction;
 
-        // 5. Wrap
         if (this.x < 0) this.x = width;
         if (this.x > width) this.x = 0;
         if (this.y < 0) this.y = height;
@@ -141,28 +137,19 @@ export const AnimatedBackground: React.FC = () => {
 
       draw() {
         const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-        
-        // Threshold to determine if "active" (moving fast enough to glow)
         const isMoved = speed > 0.3;
 
         let color = '';
-        let blur = 0;
         
         if (isMoved) {
-            // --- ACTIVE STATE (Glow + Color) ---
-            // Brightness and Opacity increase with speed
+            // Active: Glow & Color
             const lightness = 60; 
             const opacity = Math.min(speed * 0.3, 1);
-            
-            // Dynamic color
             color = `hsla(${this.baseHue}, 90%, ${lightness}%, ${opacity})`;
-            
-            // Add Glow
-            ctx!.shadowBlur = 15; // Intense glow
+            ctx!.shadowBlur = 15;
             ctx!.shadowColor = `hsla(${this.baseHue}, 90%, ${lightness}%, 1)`;
         } else {
-            // --- IDLE STATE (Dim + White/Grey) ---
-            // Very subtle white, no glow
+            // Idle: Dim white
             color = `rgba(255, 255, 255, 0.03)`;
             ctx!.shadowBlur = 0;
             ctx!.shadowColor = 'transparent';
@@ -182,11 +169,10 @@ export const AnimatedBackground: React.FC = () => {
            ctx!.stroke();
         } else {
             if (speed > 1.5) {
-                // Stretch into line if moving fast (Kinetic effect)
                 ctx!.lineWidth = this.size;
                 ctx!.beginPath();
                 ctx!.moveTo(this.x, this.y);
-                ctx!.lineTo(this.x - this.vx * 3, this.y - this.vy * 3); // Longer trail
+                ctx!.lineTo(this.x - this.vx * 3, this.y - this.vy * 3);
                 ctx!.stroke();
             } else {
                 ctx!.beginPath();
@@ -194,8 +180,6 @@ export const AnimatedBackground: React.FC = () => {
                 ctx!.fill();
             }
         }
-        
-        // Reset shadow for next iteration to prevent bleeding if batching (though here we set it explicitly)
         ctx!.shadowBlur = 0;
       }
     }
@@ -208,13 +192,16 @@ export const AnimatedBackground: React.FC = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
       
+      const isMobileNow = width < 768;
+      const count = isMobileNow ? 0 : 100;
+
       orbs = [];
       for (let i = 0; i < 3; i++) {
         orbs.push(new Orb(i));
       }
 
       particles = [];
-      for (let i = 0; i < PARTICLE_COUNT; i++) {
+      for (let i = 0; i < count; i++) {
         particles.push(new Particle());
       }
     };
@@ -223,29 +210,26 @@ export const AnimatedBackground: React.FC = () => {
     const animate = () => {
       if (!ctx) return;
 
-      // 1. Clear background
+      // Clear background
       ctx.fillStyle = BG_COLOR;
       ctx.fillRect(0, 0, width, height);
 
-      // 2. Draw Atmospheric Layer (Orbs)
+      // Draw Atmospheric Layer (Orbs)
       orbs.forEach(orb => {
         orb.update();
         orb.draw();
       });
 
-      // 3. Draw VFX Field (Particles)
+      // Draw VFX Field (Particles) - Array will be empty on mobile
       particles.forEach(p => {
         p.update();
         p.draw();
       });
 
-      // 4. Decay Scroll Velocity
       scrollVelocity *= 0.9;
-
       requestAnimationFrame(animate);
     };
 
-    // --- Event Handlers ---
     const onResize = () => init();
 
     const onScroll = () => {
