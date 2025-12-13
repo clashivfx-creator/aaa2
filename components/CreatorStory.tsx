@@ -24,7 +24,7 @@ export const CreatorStory: React.FC = () => {
                 
                 {/* Updated Artists List with Gold Shine Effect */}
                 <p>
-                  Hoy, he trabajado con <strong className="block mt-4 text-2xl font-bold text-gold-shine leading-snug">Rauw Alejandro, Emilia Mernes, Duki, Khea, Kun Agüero, YSY A, Tiago PZK, Lit Killah, y muchos más.</strong>
+                  Hoy, he trabajado con <strong className="block mt-4 text-2xl font-bold text-gold-shine leading-snug">Rauw Alejandro, Emilia Mernes, Duki, Khea, Kun Agüero, YSY A, Thiago PZK, Lit Killah, y muchos más.</strong>
                 </p>
 
                 <div className="pt-4">
