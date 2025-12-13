@@ -25,8 +25,18 @@ export const Hero: React.FC = () => {
             </div>
             
             <FadeIn delay={500}>
-              <div className="block transform hover:scale-[1.02] transition-transform duration-500">
-                <span className="inline-block text-shimmer">
+              <div className="block transform hover:scale-[1.02] transition-transform duration-500 relative inline-block">
+                {/* 
+                   True Gradient Glow Technique:
+                   Duplicate the text behind the main text.
+                   Apply the same gradient animation but add blur and reduce opacity.
+                   This makes the glow match the text color perfectly pixel-by-pixel.
+                */}
+                <span className="absolute inset-0 text-shimmer blur-lg opacity-60 select-none z-0" aria-hidden="true">
+                  Top 1% de Editores
+                </span>
+                
+                <span className="relative z-10 inline-block text-shimmer">
                   Top 1% de Editores
                 </span>
               </div>
