@@ -14,30 +14,26 @@ export const AnimatedBackground: React.FC = () => {
     let height = canvas.height = window.innerHeight;
 
     // --- Configuration ---
-    // Deep dark background
     const BG_COLOR = '#000000';
     
     // Requested Colors: Violet, Orange, Celeste
-    // Subtle atmospheric lights
-    const ORB_COLORS = [
+    const THEME_COLORS = [
       { r: 139, g: 92, b: 246 },  // Violet
       { r: 249, g: 115, b: 22 },  // Orange
       { r: 56, g: 189, b: 248 }   // Celeste (Light Blue)
     ];
 
-    // Particle settings
-    // CRITICAL CHANGE: 0 particles on mobile (< 768px)
-    const isMobile = window.innerWidth < 768;
-    const PARTICLE_COUNT = isMobile ? 0 : 100;
-    
-    const MOUSE_RANGE = 200;
+    // Background Orbs settings
+    const ORB_COUNT = 15; // Increased amount of lights
+    const ORB_OPACITY = 0.12; // Increased opacity (was 0.05)
+
+    // Mouse Trail settings
+    const TRAIL_MAX_AGE = 25; // How long the trail lingers
+    const TRAIL_SPAWN_RATE = 2; // Higher = fewer gaps
 
     // --- State ---
     const mouse = { x: -1000, y: -1000 };
-    let scrollY = window.scrollY;
-    let lastScrollY = scrollY;
-    let scrollVelocity = 0;
-
+    
     // --- Classes ---
 
     // Ambient Glow Orbs (Atmospheric Layer)
@@ -47,36 +43,37 @@ export const AnimatedBackground: React.FC = () => {
       vx: number;
       vy: number;
       radius: number;
-      color: string;
+      color: { r: number, g: number, b: number };
+      baseAlpha: number;
 
       constructor(colorIdx: number) {
-        this.radius = Math.min(width, height) * 0.6; // Slightly larger for better blending
+        // Variation in size
+        this.radius = Math.random() * (Math.min(width, height) * 0.4) + 100; 
         this.x = Math.random() * width;
         this.y = Math.random() * height;
         // Slow, drifting movement
-        this.vx = (Math.random() - 0.5) * 0.2;
-        this.vy = (Math.random() - 0.5) * 0.2;
+        this.vx = (Math.random() - 0.5) * 0.15;
+        this.vy = (Math.random() - 0.5) * 0.15;
         
-        const c = ORB_COLORS[colorIdx % ORB_COLORS.length];
-        // 5% Opacity as requested
-        this.color = `rgba(${c.r}, ${c.g}, ${c.b}, 0.05)`; 
+        this.color = THEME_COLORS[colorIdx % THEME_COLORS.length];
+        this.baseAlpha = ORB_OPACITY + (Math.random() * 0.05); // Slight opacity variation
       }
 
       update() {
         this.x += this.vx;
         this.y += this.vy;
 
-        // Gentle bounce off screen edges
-        if (this.x < -this.radius) this.vx = Math.abs(this.vx);
-        if (this.x > width + this.radius) this.vx = -Math.abs(this.vx);
-        if (this.y < -this.radius) this.vy = Math.abs(this.vy);
-        if (this.y > height + this.radius) this.vy = -Math.abs(this.vy);
+        // Gentle bounce off screen edges with buffer
+        const buffer = this.radius;
+        if (this.x < -buffer) this.vx = Math.abs(this.vx);
+        if (this.x > width + buffer) this.vx = -Math.abs(this.vx);
+        if (this.y < -buffer) this.vy = Math.abs(this.vy);
+        if (this.y > height + buffer) this.vy = -Math.abs(this.vy);
       }
 
       draw() {
-        // Soft gradient for the "light" effect
         const g = ctx!.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-        g.addColorStop(0, this.color);
+        g.addColorStop(0, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.baseAlpha})`);
         g.addColorStop(1, 'rgba(0,0,0,0)');
         
         ctx!.fillStyle = g;
@@ -86,123 +83,63 @@ export const AnimatedBackground: React.FC = () => {
       }
     }
 
-    // VFX Particles (The "bolitas")
-    class Particle {
+    // Elegant Mouse Trail (Subtle Glows)
+    class TrailNode {
       x: number;
       y: number;
-      vx: number;
-      vy: number;
-      friction: number;
-      size: number;
-      baseHue: number;
-      type: 'dot' | 'cross';
+      age: number;
+      radius: number;
+      color: { r: number, g: number, b: number };
 
-      constructor() {
-        this.x = Math.random() * width;
-        this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * 0.2; 
-        this.vy = (Math.random() - 0.5) * 0.2;
-        this.friction = 0.94; 
-        this.size = Math.random() * 1.5 + 0.5; 
-        this.type = Math.random() > 0.9 ? 'cross' : 'dot';
-        this.baseHue = Math.random() * 360; 
+      constructor(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+        this.age = 0;
+        this.radius = Math.random() * 40 + 30; // Soft glow size
+        // Pick a random theme color for the trail glow
+        this.color = THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)];
       }
 
       update() {
-        this.vy += scrollVelocity * 0.02;
-
-        const dx = mouse.x - this.x;
-        const dy = mouse.y - this.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < MOUSE_RANGE) {
-           const force = (MOUSE_RANGE - dist) / MOUSE_RANGE;
-           const angle = Math.atan2(dy, dx);
-           const push = force * 0.8;
-           
-           this.vx -= Math.cos(angle) * push;
-           this.vy -= Math.sin(angle) * push;
-        }
-
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vx *= this.friction;
-        this.vy *= this.friction;
-
-        if (this.x < 0) this.x = width;
-        if (this.x > width) this.x = 0;
-        if (this.y < 0) this.y = height;
-        if (this.y > height) this.y = 0;
+        this.age++;
       }
 
       draw() {
-        const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-        const isMoved = speed > 0.3;
+        const lifePercent = this.age / TRAIL_MAX_AGE;
+        if (lifePercent >= 1) return;
 
-        let color = '';
-        
-        if (isMoved) {
-            // Active: Glow & Color
-            const lightness = 60; 
-            const opacity = Math.min(speed * 0.3, 1);
-            color = `hsla(${this.baseHue}, 90%, ${lightness}%, ${opacity})`;
-            ctx!.shadowBlur = 15;
-            ctx!.shadowColor = `hsla(${this.baseHue}, 90%, ${lightness}%, 1)`;
-        } else {
-            // Idle: Dim white
-            color = `rgba(255, 255, 255, 0.03)`;
-            ctx!.shadowBlur = 0;
-            ctx!.shadowColor = 'transparent';
-        }
+        // Alpha fades out
+        const alpha = (1 - lifePercent) * 0.3; // Max opacity 0.3 for subtlety
 
-        ctx!.fillStyle = color;
-        ctx!.strokeStyle = color;
+        const g = ctx!.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+        // Core is slightly white/bright, outer is colored
+        g.addColorStop(0, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${alpha})`);
+        g.addColorStop(0.5, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${alpha * 0.5})`);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
 
-        if (this.type === 'cross') {
-           const s = this.size; 
-           ctx!.lineWidth = 0.5;
-           ctx!.beginPath();
-           ctx!.moveTo(this.x - s, this.y);
-           ctx!.lineTo(this.x + s, this.y);
-           ctx!.moveTo(this.x, this.y - s);
-           ctx!.lineTo(this.x, this.y + s);
-           ctx!.stroke();
-        } else {
-            if (speed > 1.5) {
-                ctx!.lineWidth = this.size;
-                ctx!.beginPath();
-                ctx!.moveTo(this.x, this.y);
-                ctx!.lineTo(this.x - this.vx * 3, this.y - this.vy * 3);
-                ctx!.stroke();
-            } else {
-                ctx!.beginPath();
-                ctx!.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx!.fill();
-            }
-        }
-        ctx!.shadowBlur = 0;
+        ctx!.fillStyle = g;
+        ctx!.beginPath();
+        ctx!.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx!.fill();
+      }
+
+      isDead() {
+        return this.age >= TRAIL_MAX_AGE;
       }
     }
 
     // --- Initialization ---
     let orbs: Orb[] = [];
-    let particles: Particle[] = [];
+    let trail: TrailNode[] = [];
+    let frameCount = 0;
 
     const init = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
       
-      const isMobileNow = width < 768;
-      const count = isMobileNow ? 0 : 100;
-
       orbs = [];
-      for (let i = 0; i < 3; i++) {
+      for (let i = 0; i < ORB_COUNT; i++) {
         orbs.push(new Orb(i));
-      }
-
-      particles = [];
-      for (let i = 0; i < count; i++) {
-        particles.push(new Particle());
       }
     };
 
@@ -210,64 +147,68 @@ export const AnimatedBackground: React.FC = () => {
     const animate = () => {
       if (!ctx) return;
 
-      // Clear background
+      // Clear background with solid color (no trails from moving objects)
       ctx.fillStyle = BG_COLOR;
       ctx.fillRect(0, 0, width, height);
 
-      // Draw Atmospheric Layer (Orbs)
+      // 1. Draw Background Orbs
+      ctx.globalCompositeOperation = 'screen'; // Blends lights nicely
       orbs.forEach(orb => {
         orb.update();
         orb.draw();
       });
 
-      // Draw VFX Field (Particles) - Array will be empty on mobile
-      particles.forEach(p => {
-        p.update();
-        p.draw();
-      });
+      // 2. Draw Mouse Trail
+      // Use lighter blending for the trail
+      ctx.globalCompositeOperation = 'lighter'; 
+      for (let i = trail.length - 1; i >= 0; i--) {
+        const node = trail[i];
+        node.update();
+        node.draw();
+        if (node.isDead()) {
+          trail.splice(i, 1);
+        }
+      }
 
-      scrollVelocity *= 0.9;
+      // Reset composition
+      ctx.globalCompositeOperation = 'source-over';
+
+      frameCount++;
       requestAnimationFrame(animate);
     };
 
     const onResize = () => init();
 
-    const onScroll = () => {
-       scrollY = window.scrollY;
-       scrollVelocity = scrollY - lastScrollY;
-       lastScrollY = scrollY;
-    };
-
     const onMouseMove = (e: MouseEvent) => {
        mouse.x = e.clientX;
        mouse.y = e.clientY;
+
+       // Add trail node occasionally to prevent performance heavy continuous gradients
+       // But frequent enough to look like a line/path
+       if (frameCount % TRAIL_SPAWN_RATE === 0) {
+         trail.push(new TrailNode(mouse.x, mouse.y));
+       }
     };
 
     const onTouchMove = (e: TouchEvent) => {
        mouse.x = e.touches[0].clientX;
        mouse.y = e.touches[0].clientY;
-    };
-
-    const onTouchEnd = () => {
-       mouse.x = -1000;
-       mouse.y = -1000;
+       if (frameCount % TRAIL_SPAWN_RATE === 0) {
+         trail.push(new TrailNode(mouse.x, mouse.y));
+       }
     };
 
     window.addEventListener('resize', onResize);
-    window.addEventListener('scroll', onScroll);
     window.addEventListener('mousemove', onMouseMove);
     window.addEventListener('touchmove', onTouchMove);
-    window.addEventListener('touchend', onTouchEnd);
 
     init();
     animate();
 
     return () => {
       window.removeEventListener('resize', onResize);
-      window.removeEventListener('scroll', onScroll);
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('touchend', onTouchEnd);
     };
   }, []);
 
