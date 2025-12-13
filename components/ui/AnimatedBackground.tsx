@@ -25,7 +25,7 @@ export const AnimatedBackground: React.FC = () => {
 
     // Settings
     const ORB_COUNT = 10; 
-    const ORB_OPACITY = 0.10; // Exactly 10% opacity as requested
+    const ORB_OPACITY = 0.06; // Lowered to 6% for subtler effect
 
     class Orb {
       x: number;
