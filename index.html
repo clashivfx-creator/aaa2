@@ -140,15 +140,26 @@
         }
       }
       
-      /* Button Sheen Animation */
-      @keyframes sheen {
-        0% { transform: skewX(-45deg) translateX(-150%); }
-        20% { transform: skewX(-45deg) translateX(150%); }
-        100% { transform: skewX(-45deg) translateX(150%); }
+      /* OLD Button Sheen Animation (Removed to fix ugly loop) */
+      /* New Smooth Continuous Sheen */
+      @keyframes sheen-smooth {
+        0% { transform: skewX(-20deg) translateX(-150%); }
+        100% { transform: skewX(-20deg) translateX(250%); }
       }
       
-      .animate-sheen {
-        animation: sheen 4s infinite;
+      .animate-sheen-smooth {
+        animation: sheen-smooth 2.5s infinite linear;
+      }
+
+      /* Gradient Pan for Button Glow Background */
+      @keyframes gradient-pan {
+        0% { background-position: 0% 50%; }
+        100% { background-position: 200% 50%; }
+      }
+      
+      .animate-gradient-x {
+        background-size: 200% auto;
+        animation: gradient-pan 3s linear infinite;
       }
 
       /* Pulse Glow Animation for CTA */

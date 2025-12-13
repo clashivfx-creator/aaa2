@@ -53,9 +53,18 @@ export const Hero: React.FC = () => {
         <FadeIn delay={1000}>
           <div className="flex flex-col items-center gap-6">
             <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto justify-center">
-              <a href="https://e08ff1-xx.myshopify.com/products/formacion-1-a-1" target="_blank" rel="noopener noreferrer" className="w-full md:w-auto">
-                {/* Updated Button: Smaller on mobile (text-sm, px-6, py-3), Larger on desktop (md:text-xl, md:px-10, md:py-5) */}
-                <Button className="w-full md:w-auto text-sm md:text-xl px-6 py-3 md:px-10 md:py-5 animate-pulse-glow hover:animate-none shadow-[0_0_40px_-5px_rgba(147,51,234,0.3)] border border-white/10">
+              <a href="https://e08ff1-xx.myshopify.com/products/formacion-1-a-1" target="_blank" rel="noopener noreferrer" className="w-full md:w-auto relative group">
+                
+                {/* 
+                   True Gradient Glow for Button (Background):
+                   Removed animate-gradient-x (side-to-side) as requested.
+                   Kept the gradient colors to match the button.
+                   This creates a static glow that matches the button's gradient.
+                */}
+                <div className="absolute -inset-1 rounded-full blur-xl opacity-60 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 transition-opacity duration-500 group-hover:opacity-80"></div>
+                
+                {/* Button: Restored animate-pulse-glow (shrink/grow subtle animation) */}
+                <Button className="relative z-10 w-full md:w-auto text-sm md:text-xl px-6 py-3 md:px-10 md:py-5 border border-white/10 animate-pulse-glow">
                   ENTRAR A LA FORMACION
                 </Button>
               </a>
