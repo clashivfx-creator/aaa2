@@ -15,12 +15,13 @@ export const AnimatedBackground: React.FC = () => {
     let height = canvas.height = window.innerHeight;
 
     const CONFIG = {
-      baseColor: '#050505',
-      particleCount: window.innerWidth < 768 ? 60 : 140, 
+      baseColor: '#000000', // Pure black for maximum contrast
+      particleCount: window.innerWidth < 768 ? 50 : 120, 
       mouseRange: 250, 
-      // Reduced scrollFactor significantly (0.25) to create depth/parallax effect
-      // The background moves slower than the foreground content
-      scrollFactor: 0.25, 
+      scrollFactor: 0.25,
+      // Factor for the fade-out delay (Lower = slower fade out)
+      // 0.05 corresponds roughly to a 0.5s smooth transition
+      lerpFactor: 0.05 
     };
 
     // --- State ---
@@ -28,6 +29,8 @@ export const AnimatedBackground: React.FC = () => {
     let scrollY = window.scrollY;
     let lastScrollY = scrollY;
     let scrollVelocity = 0;
+    let animationFrameId: number;
+    let time = 0;
 
     // --- Classes ---
 
@@ -42,18 +45,19 @@ export const AnimatedBackground: React.FC = () => {
         this.y = height * yRel;
         this.vx = (Math.random() - 0.5) * 0.05;
         this.vy = (Math.random() - 0.5) * 0.05;
-        this.color = `hsla(${hue}, 85%, 60%, 0.16)`;
+        // Reduced opacity (0.16 -> 0.12) for darker background
+        this.color = `hsla(${hue}, 85%, 55%, 0.12)`;
       }
 
       update() {
         this.x += this.vx;
         this.y += this.vy;
-        
         if (this.x < 0 || this.x > width) this.vx *= -1;
         if (this.y < 0 || this.y > height) this.vy *= -1;
       }
 
       draw() {
+        // No blur on orbs to save performance, they are gradients anyway
         const g = ctx!.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
         g.addColorStop(0, this.color);
         g.addColorStop(1, 'rgba(0,0,0,0)');
@@ -70,69 +74,81 @@ export const AnimatedBackground: React.FC = () => {
       baseY: number;
       size: number;
       baseHue: number;
+      randomOffset: number;
+      currentIntensity: number; // For smooth fading
       
       constructor() {
         this.baseX = Math.random() * width;
         this.baseY = Math.random() * height * 2; 
-        this.size = Math.random() * 2 + 1; 
+        // Slightly larger for "bokeh" blur effect
+        this.size = Math.random() * 2.5 + 1.5; 
+        this.randomOffset = Math.random() * 100;
+        this.currentIntensity = 0; // Starts at 0
         
         const hues = [260, 30, 190]; 
         this.baseHue = hues[Math.floor(Math.random() * hues.length)] + (Math.random() * 40 - 20);
       }
 
       draw() {
-        // Scroll calculation with low parallax factor for depth
-        let screenY = (this.baseY - scrollY * CONFIG.scrollFactor) % height;
+        // 1. Idle Movement (Floating)
+        // Add subtle sine wave movement based on time
+        const floatX = Math.sin(time * 0.001 + this.randomOffset) * 20; // 20px horizontal drift
+        const floatY = Math.cos(time * 0.001 + this.randomOffset) * 20; // 20px vertical drift
+
+        // 2. Position Calculation
+        let screenY = (this.baseY + floatY - scrollY * CONFIG.scrollFactor) % height;
         if (screenY < 0) screenY += height;
         
-        const screenX = this.baseX;
+        const screenX = this.baseX + floatX;
 
+        // 3. Interaction Logic
         const dx = mouse.x - screenX;
         const dy = mouse.y - screenY;
         const dist = Math.sqrt(dx * dx + dy * dy);
         
-        // Activate on lower velocity threshold so it feels responsive
         const isScrolling = Math.abs(scrollVelocity) > 0.5;
         const isHovered = dist < CONFIG.mouseRange;
         
-        let color = 'rgba(255, 255, 255, 0.2)'; 
-        let size = this.size;
-        let glow = false;
-
-        if (isScrolling || isHovered) {
-          let intensity = 0;
-          
-          if (isHovered) {
-            intensity = Math.max(intensity, 1 - dist / CONFIG.mouseRange);
-          }
-          if (isScrolling) {
-             // Calculate intensity based on scroll speed
-            intensity = Math.max(intensity, Math.min(Math.abs(scrollVelocity) / 8, 1));
-          }
-
-          // More vibrant, saturated colors when moving
-          const alpha = 0.4 + intensity * 0.6;
-          color = `hsla(${this.baseHue}, 95%, 65%, ${alpha})`;
-          
-          // Activate glow on both scroll and hover
-          glow = true;
+        // 4. Intensity Target Calculation
+        let targetIntensity = 0;
+        
+        if (isHovered) {
+          targetIntensity = Math.max(targetIntensity, 1 - dist / CONFIG.mouseRange);
         }
+        if (isScrolling) {
+          targetIntensity = Math.max(targetIntensity, Math.min(Math.abs(scrollVelocity) / 8, 1));
+        }
+
+        // 5. Smooth Lerp (Linear Interpolation) for the "Delay" effect
+        // Move currentIntensity towards targetIntensity slowly
+        this.currentIntensity += (targetIntensity - this.currentIntensity) * CONFIG.lerpFactor;
+
+        // 6. Visual Application
+        
+        // Saturation: 0% (White) -> 90% (Color)
+        const saturation = this.currentIntensity * 90; 
+        // Lightness: 60% (Greyish) -> 70% (Bright)
+        const lightness = 60 + this.currentIntensity * 10;
+        // Alpha: 0.1 (Faint) -> 0.8 (Visible)
+        const alpha = 0.1 + this.currentIntensity * 0.7;
+
+        const color = `hsla(${this.baseHue}, ${saturation}%, ${lightness}%, ${alpha})`;
 
         ctx!.fillStyle = color;
         
-        if (glow) {
-            // Stronger glow (increased blur radius)
-            ctx!.shadowBlur = 20;
-            ctx!.shadowColor = color;
-        } else {
-            ctx!.shadowBlur = 0;
-        }
+        // Blur logic:
+        // Always minimal blur (5px shadow) to look defocused
+        // Intense blur (25px shadow) when active
+        const blurRadius = 5 + (this.currentIntensity * 20);
+        
+        ctx!.shadowBlur = blurRadius;
+        ctx!.shadowColor = color;
 
         ctx!.beginPath();
-        ctx!.arc(screenX, screenY, size, 0, Math.PI * 2);
+        ctx!.arc(screenX, screenY, this.size, 0, Math.PI * 2);
         ctx!.fill();
         
-        ctx!.shadowBlur = 0; 
+        ctx!.shadowBlur = 0; // Reset
       }
     }
 
@@ -166,8 +182,14 @@ export const AnimatedBackground: React.FC = () => {
       lastScrollY = currentScrollY;
       scrollY = currentScrollY;
       
+      time += 16; // Approx 1 frame at 60fps
+      
       ctx.fillStyle = CONFIG.baseColor;
       ctx.fillRect(0, 0, width, height);
+      
+      // Global slight blur for "desenfocadas" effect
+      // This is efficient on modern browsers
+      ctx.filter = 'blur(0.8px)';
 
       orbs.forEach(orb => {
         orb.update();
@@ -178,7 +200,9 @@ export const AnimatedBackground: React.FC = () => {
         p.draw();
       });
 
-      requestAnimationFrame(animate);
+      ctx.filter = 'none'; // Reset filter
+
+      animationFrameId = requestAnimationFrame(animate);
     };
 
     const handleResize = () => init();
@@ -197,13 +221,14 @@ export const AnimatedBackground: React.FC = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
+      cancelAnimationFrame(animationFrameId);
     };
   }, []);
 
   return (
     <canvas 
       ref={canvasRef} 
-      className="fixed inset-0 w-full h-full pointer-events-none -z-10 bg-[#050505]" 
+      className="fixed inset-0 w-full h-full pointer-events-none -z-10 bg-black" 
     />
   );
 };
