@@ -16,16 +16,21 @@ export const AnimatedBackground: React.FC = () => {
     // --- Configuration ---
     const BG_COLOR = '#000000';
     
-    // Requested Colors: Violet, Orange, Celeste (Sky Blue)
+    // Requested Colors
     const THEME_COLORS = [
       { r: 139, g: 92, b: 246 },  // Violet-500
       { r: 249, g: 115, b: 22 },  // Orange-500
-      { r: 56, g: 189, b: 248 }   // Sky-400 (Celeste)
+      { r: 56, g: 189, b: 248 }   // Sky-400
     ];
 
     // Settings
     const ORB_COUNT = 10; 
-    const ORB_OPACITY = 0.06; // Lowered to 6% for subtler effect
+    
+    // TRICK TO FIX BANDING:
+    // We draw with HIGH opacity internally (0.8) to use the full 0-255 color range,
+    // creating a smooth gradient without steps.
+    // Then we lower the opacity of the entire canvas via CSS to make it subtle.
+    const INTERNAL_ORB_OPACITY = 0.8; 
 
     class Orb {
       x: number;
@@ -36,14 +41,12 @@ export const AnimatedBackground: React.FC = () => {
       color: { r: number, g: number, b: number };
 
       constructor(colorIdx: number) {
-        // Large Size: 40% to 90% of screen minimum dimension
         const minDim = Math.min(width, height);
         this.radius = Math.random() * (minDim * 0.5) + (minDim * 0.4); 
         
         this.x = Math.random() * width;
         this.y = Math.random() * height;
         
-        // Subtle drift movement
         this.vx = (Math.random() - 0.5) * 0.3;
         this.vy = (Math.random() - 0.5) * 0.3;
         
@@ -54,7 +57,6 @@ export const AnimatedBackground: React.FC = () => {
         this.x += this.vx;
         this.y += this.vy;
 
-        // Bounce gently off bounds with large buffer
         const buffer = this.radius * 0.5;
         if (this.x < -buffer) this.vx = Math.abs(this.vx);
         if (this.x > width + buffer) this.vx = -Math.abs(this.vx);
@@ -63,8 +65,9 @@ export const AnimatedBackground: React.FC = () => {
       }
 
       draw() {
+        // Create gradient with high opacity
         const g = ctx!.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-        g.addColorStop(0, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${ORB_OPACITY})`);
+        g.addColorStop(0, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${INTERNAL_ORB_OPACITY})`);
         g.addColorStop(1, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, 0)`);
         
         ctx!.fillStyle = g;
@@ -89,11 +92,9 @@ export const AnimatedBackground: React.FC = () => {
     const animate = () => {
       if (!ctx) return;
 
-      // Clear background with solid black
       ctx.fillStyle = BG_COLOR;
       ctx.fillRect(0, 0, width, height);
 
-      // Draw orbs using normal blending for smoothest gradient (no screen mode artifacts)
       ctx.globalCompositeOperation = 'source-over'; 
       orbs.forEach(orb => {
         orb.update();
@@ -116,11 +117,28 @@ export const AnimatedBackground: React.FC = () => {
   }, []);
 
   return (
-    // 'hidden md:block' hides it on mobile, shows on tablet/desktop.
-    // 'blur-[80px]' ensures the canvas result is extremely soft, removing any "grid" or banding feel.
-    <canvas 
-      ref={canvasRef} 
-      className="hidden md:block fixed inset-0 w-full h-full pointer-events-none -z-10 blur-[80px]" 
-    />
+    <div className="hidden md:block fixed inset-0 w-full h-full pointer-events-none -z-10">
+      {/* 
+        Canvas Layer:
+        opacity-[0.08] scales the internal 0.8 opacity down to ~0.064 effective visual opacity.
+        blur-[120px] helps smooth out the shapes even more.
+      */}
+      <canvas 
+        ref={canvasRef} 
+        className="absolute inset-0 w-full h-full blur-[120px] opacity-[0.08]" 
+      />
+
+      {/* 
+        Dithering Layer:
+        A barely visible static noise layer (3% opacity) overlaid on top.
+        This breaks up the color bands on monitors, making gradients look perfectly smooth.
+      */}
+      <div 
+        className="absolute inset-0 w-full h-full opacity-[0.03] mix-blend-overlay"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+        }}
+      />
+    </div>
   );
 };
