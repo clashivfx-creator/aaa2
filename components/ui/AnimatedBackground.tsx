@@ -18,8 +18,9 @@ export const AnimatedBackground: React.FC = () => {
       baseColor: '#050505',
       particleCount: window.innerWidth < 768 ? 60 : 140, 
       mouseRange: 250, 
-      // Fixed scroll synchronization (0.8 provides a tight feel while maintaining slight depth)
-      scrollFactor: 0.8, 
+      // Reduced scrollFactor significantly (0.25) to create depth/parallax effect
+      // The background moves slower than the foreground content
+      scrollFactor: 0.25, 
     };
 
     // --- State ---
@@ -30,19 +31,17 @@ export const AnimatedBackground: React.FC = () => {
 
     // --- Classes ---
 
-    // 1. Ambient Background Orbs (Atmosphere) - Increased Intensity
+    // 1. Ambient Background Orbs (Atmosphere)
     class Orb {
       x: number; y: number; vx: number; vy: number;
       radius: number; color: string;
       
       constructor(hue: number, xRel: number, yRel: number) {
-        this.radius = Math.max(width, height) * 0.6; // Large diffuse areas
+        this.radius = Math.max(width, height) * 0.6; 
         this.x = width * xRel;
         this.y = height * yRel;
-        // Very slow organic movement
         this.vx = (Math.random() - 0.5) * 0.05;
         this.vy = (Math.random() - 0.5) * 0.05;
-        // Increased intensity (was 0.12) for stronger light diffusion
         this.color = `hsla(${hue}, 85%, 60%, 0.16)`;
       }
 
@@ -50,7 +49,6 @@ export const AnimatedBackground: React.FC = () => {
         this.x += this.vx;
         this.y += this.vy;
         
-        // Gentle bounce
         if (this.x < 0 || this.x > width) this.vx *= -1;
         if (this.y < 0 || this.y > height) this.vy *= -1;
       }
@@ -75,8 +73,7 @@ export const AnimatedBackground: React.FC = () => {
       
       constructor() {
         this.baseX = Math.random() * width;
-        this.baseY = Math.random() * height * 2; // Distribute over 2x height
-        // Increased particle size slightly (Range: 1.0 - 3.0)
+        this.baseY = Math.random() * height * 2; 
         this.size = Math.random() * 2 + 1; 
         
         const hues = [260, 30, 190]; 
@@ -84,7 +81,7 @@ export const AnimatedBackground: React.FC = () => {
       }
 
       draw() {
-        // Strict, lag-free scroll synchronization calculated every frame
+        // Scroll calculation with low parallax factor for depth
         let screenY = (this.baseY - scrollY * CONFIG.scrollFactor) % height;
         if (screenY < 0) screenY += height;
         
@@ -94,11 +91,10 @@ export const AnimatedBackground: React.FC = () => {
         const dy = mouse.y - screenY;
         const dist = Math.sqrt(dx * dx + dy * dy);
         
-        // Lower threshold slightly for frame-based velocity calculation
-        const isScrolling = Math.abs(scrollVelocity) > 1;
+        // Activate on lower velocity threshold so it feels responsive
+        const isScrolling = Math.abs(scrollVelocity) > 0.5;
         const isHovered = dist < CONFIG.mouseRange;
         
-        // Base color slightly more visible
         let color = 'rgba(255, 255, 255, 0.2)'; 
         let size = this.size;
         let glow = false;
@@ -110,21 +106,23 @@ export const AnimatedBackground: React.FC = () => {
             intensity = Math.max(intensity, 1 - dist / CONFIG.mouseRange);
           }
           if (isScrolling) {
-            intensity = Math.max(intensity, Math.min(Math.abs(scrollVelocity) / 15, 0.8));
+             // Calculate intensity based on scroll speed
+            intensity = Math.max(intensity, Math.min(Math.abs(scrollVelocity) / 8, 1));
           }
 
-          const alpha = 0.3 + intensity * 0.7;
-          color = `hsla(${this.baseHue}, 80%, 70%, ${alpha})`;
+          // More vibrant, saturated colors when moving
+          const alpha = 0.4 + intensity * 0.6;
+          color = `hsla(${this.baseHue}, 95%, 65%, ${alpha})`;
           
-          if (isHovered) {
-             glow = true;
-          }
+          // Activate glow on both scroll and hover
+          glow = true;
         }
 
         ctx!.fillStyle = color;
         
         if (glow) {
-            ctx!.shadowBlur = 12;
+            // Stronger glow (increased blur radius)
+            ctx!.shadowBlur = 20;
             ctx!.shadowColor = color;
         } else {
             ctx!.shadowBlur = 0;
@@ -163,23 +161,19 @@ export const AnimatedBackground: React.FC = () => {
     const animate = () => {
       if (!ctx) return;
       
-      // CRITICAL: Read scroll position directly in the loop to eliminate event listener latency
       const currentScrollY = window.scrollY;
       scrollVelocity = currentScrollY - lastScrollY;
       lastScrollY = currentScrollY;
       scrollY = currentScrollY;
       
-      // Clear
       ctx.fillStyle = CONFIG.baseColor;
       ctx.fillRect(0, 0, width, height);
 
-      // Draw Atmosphere
       orbs.forEach(orb => {
         orb.update();
         orb.draw();
       });
 
-      // Draw Particles
       particles.forEach(p => {
         p.draw();
       });
@@ -187,7 +181,6 @@ export const AnimatedBackground: React.FC = () => {
       requestAnimationFrame(animate);
     };
 
-    // --- Event Listeners ---
     const handleResize = () => init();
 
     const handleMouseMove = (e: MouseEvent) => {
