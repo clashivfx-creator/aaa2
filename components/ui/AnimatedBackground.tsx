@@ -10,60 +10,76 @@ export const AnimatedBackground: React.FC = () => {
     const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
 
+    // --- Configuration ---
     let width = canvas.width = window.innerWidth;
     let height = canvas.height = window.innerHeight;
 
-    // --- Configuration ---
-    // Deep dark background
-    const BG_COLOR = '#050505';
-    
-    // Apple-style glow colors (Violet, Orange, Cyan) - Low saturation
-    const ORB_COLORS = [
-      { r: 120, g: 80, b: 200 }, // Soft Violet
-      { r: 200, g: 100, b: 80 }, // Soft Orange
-      { r: 60, g: 180, b: 200 }  // Soft Cyan
-    ];
-
-    // Particle settings
-    const PARTICLE_COUNT = window.innerWidth < 768 ? 50 : 120;
-    const CONNECTION_DIST = 100;
-    const MOUSE_RANGE = 180;
+    const CONFIG = {
+      baseColor: '#050505',
+      particleCount: window.innerWidth < 768 ? 50 : 100, // Balance performance vs visuals
+      mouseRange: 160,
+      obstaclePadding: 8, // Buffer around elements
+      friction: 0.94,
+      gravity: 0 // No gravity, just flow
+    };
 
     // --- State ---
     const mouse = { x: -1000, y: -1000 };
     let scrollY = window.scrollY;
     let lastScrollY = scrollY;
     let scrollVelocity = 0;
+    
+    // UI Obstacles (Bounding Boxes in Viewport Coordinates)
+    let obstacles: DOMRect[] = [];
+
+    // --- Helper: Update Obstacles ---
+    // Scans the DOM for elements that particles should collide with
+    const updateObstacles = () => {
+      // Select elements that feel "solid"
+      const selectors = [
+        '.glass-panel', 
+        'button', 
+        '.glass-card',
+        'h1', 
+        'h2',
+        'nav'
+      ];
+      
+      const elements = document.querySelectorAll(selectors.join(','));
+      const newObstacles: DOMRect[] = [];
+
+      elements.forEach(el => {
+        const rect = el.getBoundingClientRect();
+        // Optimization: Only track elements currently roughly on screen
+        if (rect.bottom > -100 && rect.top < height + 100 && rect.width > 10 && rect.height > 10) {
+          newObstacles.push(rect);
+        }
+      });
+      obstacles = newObstacles;
+    };
 
     // --- Classes ---
 
-    // Ambient Glow Orbs (Atmospheric Layer)
+    // 1. Ambient Background Orbs (Atmosphere)
     class Orb {
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      radius: number;
-      color: string;
-
-      constructor(colorIdx: number) {
-        this.radius = Math.min(width, height) * 0.5; // Large soft blobs
+      x: number; y: number; vx: number; vy: number;
+      radius: number; color: string;
+      
+      constructor(hue: number) {
+        this.radius = Math.min(width, height) * 0.7; // Large
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        // Very slow, organic movement
-        this.vx = (Math.random() - 0.5) * 0.15;
-        this.vy = (Math.random() - 0.5) * 0.15;
-        
-        const c = ORB_COLORS[colorIdx % ORB_COLORS.length];
-        // Extremely low opacity for "diffused light through glass" feel
-        this.color = `rgba(${c.r}, ${c.g}, ${c.b}, 0.04)`; 
+        this.vx = (Math.random() - 0.5) * 0.1;
+        this.vy = (Math.random() - 0.5) * 0.1;
+        // Low saturation, high brightness, very transparent for "light through glass"
+        this.color = `hsla(${hue}, 80%, 60%, 0.06)`;
       }
 
       update() {
         this.x += this.vx;
         this.y += this.vy;
-
-        // Gentle bounce
+        
+        // Bounce off walls (softly)
         if (this.x < -this.radius) this.vx = Math.abs(this.vx);
         if (this.x > width + this.radius) this.vx = -Math.abs(this.vx);
         if (this.y < -this.radius) this.vy = Math.abs(this.vy);
@@ -74,64 +90,101 @@ export const AnimatedBackground: React.FC = () => {
         const g = ctx!.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
         g.addColorStop(0, this.color);
         g.addColorStop(1, 'rgba(0,0,0,0)');
-        
         ctx!.fillStyle = g;
-        // Draw huge soft circle
         ctx!.beginPath();
         ctx!.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx!.fill();
       }
     }
 
-    // VFX Particles (Field)
+    // 2. Interactive Particles
     class Particle {
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      friction: number;
+      x: number; y: number; vx: number; vy: number;
       size: number;
-      type: 'dot' | 'cross';
-
+      baseHue: number;
+      
       constructor() {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * 0.2; // Initial slight drift
-        this.vy = (Math.random() - 0.5) * 0.2;
-        this.friction = 0.94; // Smooth deceleration
-        this.size = Math.random() * 1.5 + 0.5; // Micro sizes
-        this.type = Math.random() > 0.9 ? 'cross' : 'dot'; // 10% abstract shapes
+        this.vx = (Math.random() - 0.5) * 0.5;
+        this.vy = (Math.random() - 0.5) * 0.5;
+        this.size = Math.random() * 2 + 1; // Micro dots
+        // Assign a random base hue preference (Violet, Orange, Cyan ranges)
+        const hues = [260, 30, 180];
+        this.baseHue = hues[Math.floor(Math.random() * hues.length)] + (Math.random() * 40 - 20);
       }
 
       update() {
-        // 1. Scroll Influence (Flow)
-        // Adds a gentle vertical push based on scroll speed
-        this.vy += scrollVelocity * 0.02;
+        // --- Forces ---
 
-        // 2. Interaction (Mouse/Touch Field)
+        // 1. Scroll Energy (Inject vertical velocity)
+        // Damping the injection to prevent chaos
+        if (Math.abs(scrollVelocity) > 0.1) {
+            this.vy += scrollVelocity * 0.02;
+        }
+
+        // 2. Mouse/Touch Repulsion
         const dx = mouse.x - this.x;
         const dy = mouse.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        if (dist < MOUSE_RANGE) {
-           const force = (MOUSE_RANGE - dist) / MOUSE_RANGE;
-           // Gentle repulsion/energizing
+        if (dist < CONFIG.mouseRange) {
+           const force = (CONFIG.mouseRange - dist) / CONFIG.mouseRange;
            const angle = Math.atan2(dy, dx);
-           const push = force * 0.6; 
+           const push = force * 0.5; // Gentle push
            
            this.vx -= Math.cos(angle) * push;
            this.vy -= Math.sin(angle) * push;
         }
 
-        // 3. Physics
+        // --- Physics ---
         this.x += this.vx;
         this.y += this.vy;
 
-        // 4. Friction (The "Eased" feel)
-        this.vx *= this.friction;
-        this.vy *= this.friction;
+        // Friction (The air resistance)
+        this.vx *= CONFIG.friction;
+        this.vy *= CONFIG.friction;
 
-        // 5. Wrap around screen
+        // --- Collision with UI ---
+        // Treat obstacles as solid boxes
+        const p = CONFIG.obstaclePadding;
+        
+        // Only check collision if particle is moving enough to matter
+        if (Math.abs(this.vx) > 0.01 || Math.abs(this.vy) > 0.01) {
+            for (const rect of obstacles) {
+                // Quick AABB check
+                if (this.x > rect.left - p && this.x < rect.right + p && 
+                    this.y > rect.top - p && this.y < rect.bottom + p) {
+                    
+                    // Determine overlap on each axis
+                    const dl = Math.abs(this.x - rect.left);
+                    const dr = Math.abs(this.x - rect.right);
+                    const dt = Math.abs(this.y - rect.top);
+                    const db = Math.abs(this.y - rect.bottom);
+                    
+                    const min = Math.min(dl, dr, dt, db);
+                    
+                    // Resolve collision: Push out and reflect velocity (bounce)
+                    const bounceFactor = 0.6; // Lossy bounce
+                    
+                    if (min === dl) {
+                        this.x = rect.left - p;
+                        this.vx = -Math.abs(this.vx) * bounceFactor;
+                    } else if (min === dr) {
+                        this.x = rect.right + p;
+                        this.vx = Math.abs(this.vx) * bounceFactor;
+                    } else if (min === dt) {
+                        this.y = rect.top - p;
+                        this.vy = -Math.abs(this.vy) * bounceFactor;
+                    } else {
+                        this.y = rect.bottom + p;
+                        this.vy = Math.abs(this.vy) * bounceFactor;
+                    }
+                }
+            }
+        }
+
+        // --- Boundaries (Wrap) ---
         if (this.x < 0) this.x = width;
         if (this.x > width) this.x = 0;
         if (this.y < 0) this.y = height;
@@ -141,39 +194,53 @@ export const AnimatedBackground: React.FC = () => {
       draw() {
         const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
         
-        // Illumination: faster = brighter
-        // Base opacity is very low (0.1), scales up to 0.7
-        let opacity = 0.1 + Math.min(speed * 0.3, 0.6);
+        // Color Logic:
+        // Still = White/Gray
+        // Moving = Colored + Glowing
+        const moveThreshold = 0.3;
         
-        ctx!.fillStyle = `rgba(255, 255, 255, ${opacity})`;
-        ctx!.strokeStyle = `rgba(255, 255, 255, ${opacity})`;
+        let color = 'rgba(255, 255, 255, 0.2)'; // Default idle
+        let glow = false;
 
-        if (this.type === 'cross') {
-           // Minimal cross shape
-           const s = this.size; // small
-           ctx!.lineWidth = 0.5;
-           ctx!.beginPath();
-           ctx!.moveTo(this.x - s, this.y);
-           ctx!.lineTo(this.x + s, this.y);
-           ctx!.moveTo(this.x, this.y - s);
-           ctx!.lineTo(this.x, this.y + s);
-           ctx!.stroke();
-        } else {
-            if (speed > 1.5) {
-                // Stretch into line if moving fast (Kinetic effect)
-                ctx!.lineWidth = this.size;
-                ctx!.beginPath();
-                ctx!.moveTo(this.x, this.y);
-                // Trail extends opposite to velocity
-                ctx!.lineTo(this.x - this.vx * 2, this.y - this.vy * 2);
-                ctx!.stroke();
-            } else {
-                // Static micro dot
-                ctx!.beginPath();
-                ctx!.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx!.fill();
-            }
+        if (speed > moveThreshold) {
+            // Interpolate color intensity based on speed
+            const intensity = Math.min((speed - moveThreshold) * 0.5, 1); // 0 to 1
+            const sat = 50 + intensity * 50; // 50% to 100%
+            const light = 90 - intensity * 40; // 90% to 50%
+            const alpha = 0.3 + intensity * 0.7;
+            
+            color = `hsla(${this.baseHue}, ${sat}%, ${light}%, ${alpha})`;
+            glow = true;
         }
+
+        ctx!.fillStyle = color;
+        ctx!.strokeStyle = color;
+
+        if (glow) {
+            // Add soft glow
+            // Note: shadowBlur is expensive, so we use it sparingly or fake it
+            ctx!.shadowBlur = 15;
+            ctx!.shadowColor = color;
+        } else {
+            ctx!.shadowBlur = 0;
+        }
+
+        if (speed > 2) {
+            // Stretch effect for high speed
+            ctx!.lineWidth = this.size;
+            ctx!.beginPath();
+            ctx!.moveTo(this.x, this.y);
+            ctx!.lineTo(this.x - this.vx * 2, this.y - this.vy * 2);
+            ctx!.stroke();
+        } else {
+            // Dot
+            ctx!.beginPath();
+            ctx!.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx!.fill();
+        }
+        
+        // Reset shadow
+        ctx!.shadowBlur = 0;
       }
     }
 
@@ -185,90 +252,104 @@ export const AnimatedBackground: React.FC = () => {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
       
-      orbs = [];
-      for (let i = 0; i < 3; i++) {
-        orbs.push(new Orb(i));
-      }
+      orbs = [
+        new Orb(270), // Violet
+        new Orb(30),  // Orange
+        new Orb(180)  // Cyan
+      ];
 
       particles = [];
-      for (let i = 0; i < PARTICLE_COUNT; i++) {
+      for (let i = 0; i < CONFIG.particleCount; i++) {
         particles.push(new Particle());
       }
+      
+      // Initial obstacle detection
+      updateObstacles();
     };
 
     // --- Animation Loop ---
     const animate = () => {
       if (!ctx) return;
-
-      // 1. Clear background (Solid color to prevent trails, maintaining "Clean" look)
-      ctx.fillStyle = BG_COLOR;
+      
+      // Clear with Base Color (No trails, clean look)
+      ctx.fillStyle = CONFIG.baseColor;
       ctx.fillRect(0, 0, width, height);
 
-      // 2. Draw Atmospheric Layer (Orbs)
+      // 1. Draw Atmospheric Layer
       orbs.forEach(orb => {
         orb.update();
         orb.draw();
       });
 
-      // 3. Draw VFX Field (Particles)
+      // 2. Draw Particles
       particles.forEach(p => {
         p.update();
         p.draw();
       });
 
-      // 4. Decay Scroll Velocity
+      // Decay scroll velocity
       scrollVelocity *= 0.9;
-
+      
       requestAnimationFrame(animate);
     };
 
-    // --- Event Handlers ---
-    const onResize = () => init();
-
-    const onScroll = () => {
-       scrollY = window.scrollY;
-       scrollVelocity = scrollY - lastScrollY;
-       lastScrollY = scrollY;
+    // --- Event Listeners ---
+    
+    // Update obstacles on scroll because their viewport position changes
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      scrollVelocity = currentScrollY - lastScrollY;
+      lastScrollY = currentScrollY;
+      
+      // Critical: Update obstacles position relative to viewport
+      updateObstacles();
     };
 
-    const onMouseMove = (e: MouseEvent) => {
-       mouse.x = e.clientX;
-       mouse.y = e.clientY;
+    const handleResize = () => {
+      init();
     };
 
-    const onTouchMove = (e: TouchEvent) => {
-       mouse.x = e.touches[0].clientX;
-       mouse.y = e.touches[0].clientY;
+    const handleMouseMove = (e: MouseEvent) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
     };
 
-    const onTouchEnd = () => {
-       // Move influence out of screen so particles drift naturally
-       mouse.x = -1000;
-       mouse.y = -1000;
+    const handleTouchMove = (e: TouchEvent) => {
+        mouse.x = e.touches[0].clientX;
+        mouse.y = e.touches[0].clientY;
+    };
+    
+    const handleTouchEnd = () => {
+        mouse.x = -1000;
+        mouse.y = -1000;
     };
 
-    window.addEventListener('resize', onResize);
-    window.addEventListener('scroll', onScroll);
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('touchmove', onTouchMove);
-    window.addEventListener('touchend', onTouchEnd);
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchmove', handleTouchMove);
+    window.addEventListener('touchend', handleTouchEnd);
+    
+    // Also run obstacle update periodically to catch layout shifts (lazy load etc)
+    const intervalId = setInterval(updateObstacles, 1000);
 
     init();
     animate();
 
     return () => {
-      window.removeEventListener('resize', onResize);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+      clearInterval(intervalId);
     };
   }, []);
 
   return (
     <canvas 
       ref={canvasRef} 
-      className="fixed inset-0 w-full h-full pointer-events-none -z-10" 
+      className="fixed inset-0 w-full h-full pointer-events-none -z-10 bg-[#050505]" 
     />
   );
 };
