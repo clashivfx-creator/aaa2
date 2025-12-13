@@ -7,228 +7,248 @@ export const AnimatedBackground: React.FC = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d', { alpha: false });
+    const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // --- Configuration ---
     let width = canvas.width = window.innerWidth;
     let height = canvas.height = window.innerHeight;
 
+    // Configuration for the VFX Field
     const CONFIG = {
-      baseColor: '#000000', // Pure black for maximum contrast
-      particleCount: window.innerWidth < 768 ? 50 : 120, 
-      mouseRange: 250, 
-      scrollFactor: 0.25,
-      // Factor for the fade-out delay (Lower = slower fade out)
-      // 0.05 corresponds roughly to a 0.5s smooth transition
-      lerpFactor: 0.05 
+      bg: '#0b0b0b',
+      particleColor: 'rgba(255, 255, 255, 0.8)',
+      lineColor: 'rgba(255, 255, 255, 0.04)',
+      accentColor: 'rgba(0, 255, 255, 0.3)', // Subtle cyan accent for kinetic energy
+      connectionDist: 110,
+      mouseRange: 180,
     };
 
-    // --- State ---
+    // Physics State
+    let particles: Particle[] = [];
     const mouse = { x: -1000, y: -1000 };
-    let scrollY = window.scrollY;
-    let lastScrollY = scrollY;
-    let scrollVelocity = 0;
-    let animationFrameId: number;
-    let time = 0;
+    let scrollSpeed = 0;
+    let lastScrollY = window.scrollY;
 
-    // --- Classes ---
+    class Particle {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      size: number;
+      type: 'dot' | 'cross';
 
-    // 1. Ambient Background Orbs (Atmosphere)
-    class Orb {
-      x: number; y: number; vx: number; vy: number;
-      radius: number; color: string;
-      
-      constructor(hue: number, xRel: number, yRel: number) {
-        this.radius = Math.max(width, height) * 0.6; 
-        this.x = width * xRel;
-        this.y = height * yRel;
-        this.vx = (Math.random() - 0.5) * 0.05;
-        this.vy = (Math.random() - 0.5) * 0.05;
-        // Reduced opacity (0.16 -> 0.12) for darker background
-        this.color = `hsla(${hue}, 85%, 55%, 0.12)`;
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.vx = (Math.random() - 0.5) * 0.2;
+        this.vy = (Math.random() - 0.5) * 0.2;
+        this.size = Math.random() > 0.9 ? 1.5 : 0.8; // Micro dots
+        this.type = Math.random() > 0.85 ? 'cross' : 'dot'; // Occasional trackers
       }
 
       update() {
+        // Integrate velocity
         this.x += this.vx;
         this.y += this.vy;
-        if (this.x < 0 || this.x > width) this.vx *= -1;
-        if (this.y < 0 || this.y > height) this.vy *= -1;
-      }
 
-      draw() {
-        // No blur on orbs to save performance, they are gradients anyway
-        const g = ctx!.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-        g.addColorStop(0, this.color);
-        g.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx!.fillStyle = g;
-        ctx!.beginPath();
-        ctx!.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx!.fill();
-      }
-    }
+        // Friction (Damping)
+        this.vx *= 0.96;
+        this.vy *= 0.96;
 
-    // 2. Static Background Particles
-    class Particle {
-      baseX: number;
-      baseY: number;
-      size: number;
-      baseHue: number;
-      randomOffset: number;
-      currentIntensity: number; // For smooth fading
-      
-      constructor() {
-        this.baseX = Math.random() * width;
-        this.baseY = Math.random() * height * 2; 
-        // Slightly larger for "bokeh" blur effect
-        this.size = Math.random() * 2.5 + 1.5; 
-        this.randomOffset = Math.random() * 100;
-        this.currentIntensity = 0; // Starts at 0
-        
-        const hues = [260, 30, 190]; 
-        this.baseHue = hues[Math.floor(Math.random() * hues.length)] + (Math.random() * 40 - 20);
-      }
-
-      draw() {
-        // 1. Idle Movement (Floating)
-        // Add subtle sine wave movement based on time
-        const floatX = Math.sin(time * 0.001 + this.randomOffset) * 20; // 20px horizontal drift
-        const floatY = Math.cos(time * 0.001 + this.randomOffset) * 20; // 20px vertical drift
-
-        // 2. Position Calculation
-        let screenY = (this.baseY + floatY - scrollY * CONFIG.scrollFactor) % height;
-        if (screenY < 0) screenY += height;
-        
-        const screenX = this.baseX + floatX;
-
-        // 3. Interaction Logic
-        const dx = mouse.x - screenX;
-        const dy = mouse.y - screenY;
+        // Interaction: Mouse/Touch Repel & Flow
+        const dx = mouse.x - this.x;
+        const dy = mouse.y - this.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        
-        const isScrolling = Math.abs(scrollVelocity) > 0.5;
-        const isHovered = dist < CONFIG.mouseRange;
-        
-        // 4. Intensity Target Calculation
-        let targetIntensity = 0;
-        
-        if (isHovered) {
-          targetIntensity = Math.max(targetIntensity, 1 - dist / CONFIG.mouseRange);
-        }
-        if (isScrolling) {
-          targetIntensity = Math.max(targetIntensity, Math.min(Math.abs(scrollVelocity) / 8, 1));
+
+        if (dist < CONFIG.mouseRange) {
+          const force = (CONFIG.mouseRange - dist) / CONFIG.mouseRange;
+          const angle = Math.atan2(dy, dx);
+          const push = force * 0.4; // Subtle push
+          
+          this.vx -= Math.cos(angle) * push;
+          this.vy -= Math.sin(angle) * push;
         }
 
-        // 5. Smooth Lerp (Linear Interpolation) for the "Delay" effect
-        // Move currentIntensity towards targetIntensity slowly
-        this.currentIntensity += (targetIntensity - this.currentIntensity) * CONFIG.lerpFactor;
+        // Interaction: Scroll Vertical Force
+        this.y -= scrollSpeed * 0.3;
 
-        // 6. Visual Application
-        
-        // Saturation: 0% (White) -> 90% (Color)
-        const saturation = this.currentIntensity * 90; 
-        // Lightness: 60% (Greyish) -> 70% (Bright)
-        const lightness = 60 + this.currentIntensity * 10;
-        // Alpha: 0.1 (Faint) -> 0.8 (Visible)
-        const alpha = 0.1 + this.currentIntensity * 0.7;
+        // Boundaries: Wrap around
+        if (this.x < 0) this.x = width;
+        if (this.x > width) this.x = 0;
+        if (this.y < 0) this.y = height;
+        if (this.y > height) this.y = 0;
+      }
 
-        const color = `hsla(${this.baseHue}, ${saturation}%, ${lightness}%, ${alpha})`;
-
-        ctx!.fillStyle = color;
+      draw() {
+        if (!ctx) return;
         
-        // Blur logic:
-        // Always minimal blur (5px shadow) to look defocused
-        // Intense blur (25px shadow) when active
-        const blurRadius = 5 + (this.currentIntensity * 20);
+        // Calculate energy for color/opacity
+        const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+        const opacity = 0.2 + Math.min(speed * 0.5, 0.6);
         
-        ctx!.shadowBlur = blurRadius;
-        ctx!.shadowColor = color;
-
-        ctx!.beginPath();
-        ctx!.arc(screenX, screenY, this.size, 0, Math.PI * 2);
-        ctx!.fill();
+        ctx.fillStyle = `rgba(255, 255, 255, ${opacity})`;
         
-        ctx!.shadowBlur = 0; // Reset
+        if (this.type === 'cross') {
+           // Draw VFX tracker cross
+           const s = this.size * 2.5;
+           ctx.strokeStyle = ctx.fillStyle;
+           ctx.lineWidth = 0.5;
+           ctx.beginPath();
+           ctx.moveTo(this.x - s, this.y);
+           ctx.lineTo(this.x + s, this.y);
+           ctx.moveTo(this.x, this.y - s);
+           ctx.lineTo(this.x, this.y + s);
+           ctx.stroke();
+        } else {
+           // Draw micro dot
+           ctx.beginPath();
+           ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+           ctx.fill();
+        }
       }
     }
-
-    // --- Initialization ---
-    let orbs: Orb[] = [];
-    let particles: Particle[] = [];
 
     const init = () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
-      
-      orbs = [
-        new Orb(260, 0.2, 0.2), 
-        new Orb(30, 0.8, 0.3),  
-        new Orb(190, 0.5, 0.8), 
-        new Orb(280, 0.9, 0.9)  
-      ];
-
       particles = [];
-      for (let i = 0; i < CONFIG.particleCount; i++) {
+      const density = window.innerWidth < 768 ? 80 : 130; // Mobile vs Desktop density
+      for (let i = 0; i < density; i++) {
         particles.push(new Particle());
       }
     };
 
-    // --- Animation Loop ---
     const animate = () => {
       if (!ctx) return;
       
-      const currentScrollY = window.scrollY;
-      scrollVelocity = currentScrollY - lastScrollY;
-      lastScrollY = currentScrollY;
-      scrollY = currentScrollY;
-      
-      time += 16; // Approx 1 frame at 60fps
-      
-      ctx.fillStyle = CONFIG.baseColor;
-      ctx.fillRect(0, 0, width, height);
-      
-      // Global slight blur for "desenfocadas" effect
-      // This is efficient on modern browsers
-      ctx.filter = 'blur(0.8px)';
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
 
-      orbs.forEach(orb => {
-        orb.update();
-        orb.draw();
-      });
-
-      particles.forEach(p => {
+      // Update and Draw Particles
+      particles.forEach((p, i) => {
+        p.update();
         p.draw();
+
+        // Draw connections (Network/Plexus effect)
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const dx = p.x - p2.x;
+          const dy = p.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < CONFIG.connectionDist) {
+            ctx.beginPath();
+            const opacity = 1 - (dist / CONFIG.connectionDist);
+            
+            // Kinetic energy accent
+            const energy = Math.abs(p.vx) + Math.abs(p.vy) + Math.abs(p2.vx) + Math.abs(p2.vy);
+            
+            if (energy > 2) {
+                // Subtle accent color when moving fast (swipe/burst)
+                ctx.strokeStyle = CONFIG.accentColor.replace('0.3', `${opacity * 0.4}`);
+            } else {
+                ctx.strokeStyle = `rgba(255, 255, 255, ${opacity * 0.08})`;
+            }
+
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(p.x, p.y);
+            ctx.lineTo(p2.x, p2.y);
+            ctx.stroke();
+          }
+        }
       });
 
-      ctx.filter = 'none'; // Reset filter
-
-      animationFrameId = requestAnimationFrame(animate);
+      // Scroll damping
+      scrollSpeed *= 0.92;
+      
+      requestAnimationFrame(animate);
     };
 
-    const handleResize = () => init();
+    // Event Handlers
+    const onResize = () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      init();
+    };
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const onMouseMove = (e: MouseEvent) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
     };
 
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('mousemove', handleMouseMove);
+    const onScroll = () => {
+      const y = window.scrollY;
+      scrollSpeed = y - lastScrollY;
+      lastScrollY = y;
+    };
+
+    // Touch Logic (Mobile)
+    const onTouchStart = (e: TouchEvent) => {
+        const t = e.touches[0];
+        mouse.x = t.clientX;
+        mouse.y = t.clientY;
+        
+        // Tap Burst Effect
+        particles.forEach(p => {
+             const dx = p.x - t.clientX;
+             const dy = p.y - t.clientY;
+             const dist = Math.sqrt(dx*dx + dy*dy);
+             if (dist < 200) {
+                 const angle = Math.atan2(dy, dx);
+                 const force = (200 - dist) / 40; // Strong impulse
+                 p.vx += Math.cos(angle) * force;
+                 p.vy += Math.sin(angle) * force;
+             }
+        });
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+        const t = e.touches[0];
+        const dx = t.clientX - mouse.x;
+        const dy = t.clientY - mouse.y;
+        mouse.x = t.clientX;
+        mouse.y = t.clientY;
+        
+        // Directional kinetic swipe
+        particles.forEach(p => {
+             const pdx = p.x - t.clientX;
+             const pdy = p.y - t.clientY;
+             const dist = Math.sqrt(pdx*pdx + pdy*pdy);
+             if (dist < 150) {
+                 p.vx += dx * 0.08;
+                 p.vy += dy * 0.08;
+             }
+        });
+    };
+
+    const onTouchEnd = () => {
+        mouse.x = -1000;
+        mouse.y = -1000;
+    };
+
+    // Register Listeners
+    window.addEventListener('resize', onResize);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('scroll', onScroll);
+    window.addEventListener('touchstart', onTouchStart);
+    window.addEventListener('touchmove', onTouchMove);
+    window.addEventListener('touchend', onTouchEnd);
 
     init();
     animate();
 
     return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('mousemove', handleMouseMove);
-      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener('resize', onResize);
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
     };
   }, []);
 
   return (
     <canvas 
       ref={canvasRef} 
-      className="fixed inset-0 w-full h-full pointer-events-none -z-10 bg-black" 
+      className="fixed inset-0 w-full h-full pointer-events-none -z-10 bg-[#0b0b0b]" 
     />
   );
 };
