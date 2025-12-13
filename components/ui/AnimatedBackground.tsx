@@ -24,16 +24,9 @@ export const AnimatedBackground: React.FC = () => {
     ];
 
     // Background Orbs settings
-    const ORB_COUNT = 15; // Increased amount of lights
-    const ORB_OPACITY = 0.12; // Increased opacity (was 0.05)
+    const ORB_COUNT = 12; // Slightly fewer items since they are much bigger now
+    const ORB_OPACITY = 0.06; // Lowered opacity (was 0.12) for a subtle atmospheric look
 
-    // Mouse Trail settings
-    const TRAIL_MAX_AGE = 25; // How long the trail lingers
-    const TRAIL_SPAWN_RATE = 2; // Higher = fewer gaps
-
-    // --- State ---
-    const mouse = { x: -1000, y: -1000 };
-    
     // --- Classes ---
 
     // Ambient Glow Orbs (Atmospheric Layer)
@@ -47,24 +40,29 @@ export const AnimatedBackground: React.FC = () => {
       baseAlpha: number;
 
       constructor(colorIdx: number) {
-        // Variation in size
-        this.radius = Math.random() * (Math.min(width, height) * 0.4) + 100; 
+        // HUGE RADIUS: Randomly between 50% and 90% of the screen's smallest dimension
+        // This ensures they are very large and diffuse
+        const minDim = Math.min(width, height);
+        this.radius = Math.random() * (minDim * 0.4) + (minDim * 0.5); 
+        
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        // Slow, drifting movement
-        this.vx = (Math.random() - 0.5) * 0.15;
-        this.vy = (Math.random() - 0.5) * 0.15;
+        
+        // Very slow, drifting movement
+        this.vx = (Math.random() - 0.5) * 0.1;
+        this.vy = (Math.random() - 0.5) * 0.1;
         
         this.color = THEME_COLORS[colorIdx % THEME_COLORS.length];
-        this.baseAlpha = ORB_OPACITY + (Math.random() * 0.05); // Slight opacity variation
+        this.baseAlpha = ORB_OPACITY + (Math.random() * 0.03); // Slight opacity variation
       }
 
       update() {
         this.x += this.vx;
         this.y += this.vy;
 
-        // Gentle bounce off screen edges with buffer
-        const buffer = this.radius;
+        // Gentle bounce off screen edges with large buffer
+        // We allow them to go partially off screen
+        const buffer = this.radius * 0.5;
         if (this.x < -buffer) this.vx = Math.abs(this.vx);
         if (this.x > width + buffer) this.vx = -Math.abs(this.vx);
         if (this.y < -buffer) this.vy = Math.abs(this.vy);
@@ -72,6 +70,7 @@ export const AnimatedBackground: React.FC = () => {
       }
 
       draw() {
+        // Radial gradient for soft edges
         const g = ctx!.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
         g.addColorStop(0, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.baseAlpha})`);
         g.addColorStop(1, 'rgba(0,0,0,0)');
@@ -83,55 +82,8 @@ export const AnimatedBackground: React.FC = () => {
       }
     }
 
-    // Elegant Mouse Trail (Subtle Glows)
-    class TrailNode {
-      x: number;
-      y: number;
-      age: number;
-      radius: number;
-      color: { r: number, g: number, b: number };
-
-      constructor(x: number, y: number) {
-        this.x = x;
-        this.y = y;
-        this.age = 0;
-        this.radius = Math.random() * 40 + 30; // Soft glow size
-        // Pick a random theme color for the trail glow
-        this.color = THEME_COLORS[Math.floor(Math.random() * THEME_COLORS.length)];
-      }
-
-      update() {
-        this.age++;
-      }
-
-      draw() {
-        const lifePercent = this.age / TRAIL_MAX_AGE;
-        if (lifePercent >= 1) return;
-
-        // Alpha fades out
-        const alpha = (1 - lifePercent) * 0.3; // Max opacity 0.3 for subtlety
-
-        const g = ctx!.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
-        // Core is slightly white/bright, outer is colored
-        g.addColorStop(0, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${alpha})`);
-        g.addColorStop(0.5, `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${alpha * 0.5})`);
-        g.addColorStop(1, 'rgba(0,0,0,0)');
-
-        ctx!.fillStyle = g;
-        ctx!.beginPath();
-        ctx!.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx!.fill();
-      }
-
-      isDead() {
-        return this.age >= TRAIL_MAX_AGE;
-      }
-    }
-
     // --- Initialization ---
     let orbs: Orb[] = [];
-    let trail: TrailNode[] = [];
-    let frameCount = 0;
 
     const init = () => {
       width = canvas.width = window.innerWidth;
@@ -147,68 +99,33 @@ export const AnimatedBackground: React.FC = () => {
     const animate = () => {
       if (!ctx) return;
 
-      // Clear background with solid color (no trails from moving objects)
+      // Clear background
       ctx.fillStyle = BG_COLOR;
       ctx.fillRect(0, 0, width, height);
 
-      // 1. Draw Background Orbs
-      ctx.globalCompositeOperation = 'screen'; // Blends lights nicely
+      // Draw Background Orbs
+      // Use 'screen' composite operation to blend lights naturally
+      ctx.globalCompositeOperation = 'screen'; 
       orbs.forEach(orb => {
         orb.update();
         orb.draw();
       });
-
-      // 2. Draw Mouse Trail
-      // Use lighter blending for the trail
-      ctx.globalCompositeOperation = 'lighter'; 
-      for (let i = trail.length - 1; i >= 0; i--) {
-        const node = trail[i];
-        node.update();
-        node.draw();
-        if (node.isDead()) {
-          trail.splice(i, 1);
-        }
-      }
-
-      // Reset composition
+      
+      // Reset composite operation for next frame (if we were drawing other things)
       ctx.globalCompositeOperation = 'source-over';
 
-      frameCount++;
       requestAnimationFrame(animate);
     };
 
     const onResize = () => init();
 
-    const onMouseMove = (e: MouseEvent) => {
-       mouse.x = e.clientX;
-       mouse.y = e.clientY;
-
-       // Add trail node occasionally to prevent performance heavy continuous gradients
-       // But frequent enough to look like a line/path
-       if (frameCount % TRAIL_SPAWN_RATE === 0) {
-         trail.push(new TrailNode(mouse.x, mouse.y));
-       }
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-       mouse.x = e.touches[0].clientX;
-       mouse.y = e.touches[0].clientY;
-       if (frameCount % TRAIL_SPAWN_RATE === 0) {
-         trail.push(new TrailNode(mouse.x, mouse.y));
-       }
-    };
-
     window.addEventListener('resize', onResize);
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('touchmove', onTouchMove);
 
     init();
     animate();
 
     return () => {
       window.removeEventListener('resize', onResize);
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('touchmove', onTouchMove);
     };
   }, []);
 
