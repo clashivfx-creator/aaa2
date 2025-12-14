@@ -1,4 +1,5 @@
 import React from 'react';
+import { ShoppingBag } from 'lucide-react';
 import { Hero } from './components/Hero';
 import { WarningSection } from './components/WarningSection';
 import { FeaturesGrid } from './components/FeaturesGrid';
@@ -25,19 +26,30 @@ function App() {
       <SocialFloatingButtons />
       
       {/* Navbar overlay with Logo and Buttons */}
-      <nav className="fixed top-0 w-full z-50 px-6 md:px-8 py-4 flex justify-between items-center backdrop-blur-sm bg-black/10 border-b border-white/5 transition-all duration-300">
+      <nav className="fixed top-0 w-full z-50 px-4 md:px-8 py-4 flex justify-between items-center backdrop-blur-sm bg-black/10 border-b border-white/5 transition-all duration-300">
         <div className="flex items-center gap-2">
           <span className="text-lg font-bold tracking-widest uppercase text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">ClashiVFX</span>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
+          <a 
+            href="https://e08ff1-xx.myshopify.com/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-8 md:py-3 rounded-full bg-green-500 hover:bg-green-400 text-white text-xs md:text-base font-bold transition-all shadow-[0_0_15px_rgba(34,197,94,0.4)] hover:shadow-[0_0_25px_rgba(34,197,94,0.6)] hover:scale-105"
+          >
+             <ShoppingBag className="w-4 h-4 md:w-6 md:h-6" />
+             <span className="hidden md:inline">TODA LA TIENDA</span>
+             <span className="md:hidden">TIENDA</span>
+          </a>
+
           <a 
             href="https://discord.com/invite/zEcFPBqy6s" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-6 py-2.5 md:px-8 md:py-3 rounded-full bg-[#5865F2] hover:bg-[#4752C4] text-white text-sm md:text-base font-bold transition-all animate-pulse-glow-blue shadow-[0_0_15px_rgba(88,101,242,0.4)]"
+            className="flex items-center gap-1.5 md:gap-2 px-3 py-2 md:px-8 md:py-3 rounded-full bg-[#5865F2] hover:bg-[#4752C4] text-white text-xs md:text-base font-bold transition-all animate-pulse-glow-blue shadow-[0_0_15px_rgba(88,101,242,0.4)]"
           >
-             <DiscordIconNav className="w-5 h-5 md:w-6 md:h-6" />
+             <DiscordIconNav className="w-4 h-4 md:w-6 md:h-6" />
              Comunidad
           </a>
         </div>

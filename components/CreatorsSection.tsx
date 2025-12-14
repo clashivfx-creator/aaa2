@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, Instagram } from 'lucide-react';
+import { TrendingUp, Instagram, Clapperboard } from 'lucide-react';
 import { GlassCard } from './ui/GlassCard';
 import { FadeIn } from './ui/FadeIn';
 
@@ -17,7 +17,7 @@ const TikTokIcon = ({ className }: { className?: string }) => (
 export const CreatorsSection: React.FC = () => {
   return (
     <section className="py-16 px-4 relative">
-      <div className="container mx-auto max-w-5xl">
+      <div className="container mx-auto max-w-7xl">
         <div className="text-center mb-10">
           <FadeIn>
             <h2 className="text-4xl md:text-5xl font-bold mb-2 tracking-tight">
@@ -29,16 +29,18 @@ export const CreatorsSection: React.FC = () => {
           </FadeIn>
         </div>
 
-        <div className="grid grid-cols-1 justify-center">
-          <FadeIn delay={0}>
-            <GlassCard className="relative overflow-hidden border-purple-500/20 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 justify-center">
+          
+          {/* Daniz Card */}
+          <FadeIn delay={0} className="h-full">
+            <GlassCard className="relative overflow-hidden border-purple-500/20 h-full flex flex-col">
               {/* Background Decoration */}
               <div className="absolute top-0 right-0 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
-              <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
+              <div className="flex flex-col items-center gap-8 relative z-10 flex-1 p-2">
                 
-                {/* Video Embed Container (Vertical for Shorts) */}
-                <div className="shrink-0 w-full md:w-auto flex justify-center">
+                {/* Video Embed Container */}
+                <div className="shrink-0 w-full flex justify-center">
                   <div className="relative w-[260px] aspect-[9/16] rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black group">
                     {/* Glowing effect behind video */}
                     <div className="absolute -inset-1 bg-gradient-to-tr from-purple-500 to-pink-500 opacity-20 blur-lg group-hover:opacity-40 transition-opacity duration-500"></div>
@@ -56,20 +58,20 @@ export const CreatorsSection: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex-1 text-center md:text-left py-2">
-                  <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
+                <div className="flex-1 text-center w-full flex flex-col items-center">
+                  <div className="flex items-center justify-center gap-3 mb-3">
                       <h3 className="text-3xl font-bold text-white">Daniz</h3>
                       <div className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium flex items-center gap-1">
                         <TrendingUp className="w-3 h-3" /> Éxito
                       </div>
                   </div>
                   
-                  <p className="text-gray-300 leading-relaxed font-light text-lg mb-6">
+                  <p className="text-gray-300 leading-relaxed font-light text-lg mb-6 max-w-md">
                     Dueño de una de las marcas de ropa más grandes de España. Un referente indiscutible en emprendimiento y creación de marca personal.
                   </p>
 
                   {/* Social Links */}
-                  <div className="flex items-center justify-center md:justify-start gap-4">
+                  <div className="mt-auto flex items-center justify-center gap-4">
                     <a 
                       href="https://www.instagram.com/danizvfx_/" 
                       target="_blank" 
@@ -95,6 +97,64 @@ export const CreatorsSection: React.FC = () => {
               </div>
             </GlassCard>
           </FadeIn>
+
+          {/* Maldo Card */}
+          <FadeIn delay={100} className="h-full">
+            <GlassCard className="relative overflow-hidden border-orange-500/20 h-full flex flex-col">
+              {/* Background Decoration */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-orange-600/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+
+              <div className="flex flex-col items-center gap-8 relative z-10 flex-1 p-2">
+                
+                {/* Video Embed Container */}
+                <div className="shrink-0 w-full flex justify-center">
+                  <div className="relative w-[260px] aspect-[9/16] rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black group">
+                    {/* Glowing effect behind video */}
+                    <div className="absolute -inset-1 bg-gradient-to-tr from-orange-500 to-red-500 opacity-20 blur-lg group-hover:opacity-40 transition-opacity duration-500"></div>
+                    
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      src="https://www.youtube.com/embed/5HIresHSTZM"
+                      title="Maldo - YouTube Short"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="relative z-10 w-full h-full"
+                    ></iframe>
+                  </div>
+                </div>
+
+                <div className="flex-1 text-center w-full flex flex-col items-center">
+                  <div className="flex items-center justify-center gap-3 mb-3">
+                      <h3 className="text-3xl font-bold text-white">Maldo</h3>
+                      <div className="px-2 py-0.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-medium flex items-center gap-1">
+                        <Clapperboard className="w-3 h-3" /> Director Top
+                      </div>
+                  </div>
+                  
+                  <p className="text-gray-300 leading-relaxed font-light text-lg mb-6 max-w-md">
+                    Director de los proyectos audiovisuales más grandes de Argentina. Una figura clave en la industria trabajando con artistas y marcas de elite.
+                  </p>
+
+                  {/* Social Links */}
+                  <div className="mt-auto flex items-center justify-center gap-4">
+                    <a 
+                      href="https://www.instagram.com/maldo.av/" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="group flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-[#E1306C]/10 hover:border-[#E1306C]/50 transition-all duration-300 transform hover:scale-105"
+                    >
+                      <Instagram className="w-5 h-5 text-gray-400 group-hover:text-[#E1306C] transition-colors" />
+                      <span className="text-sm font-semibold text-gray-300 group-hover:text-white">Instagram</span>
+                    </a>
+                  </div>
+
+                </div>
+              </div>
+            </GlassCard>
+          </FadeIn>
+
         </div>
       </div>
     </section>

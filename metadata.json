@@ -1,4 +1,5 @@
 {
   "name": "VFX Formación Elite",
-  "description": "Landing page premium para una formación de alto nivel en VFX y edición de video."
+  "description": "Landing page premium para una formación de alto nivel en VFX y edición de video.",
+  "requestFramePermissions": []
 }
