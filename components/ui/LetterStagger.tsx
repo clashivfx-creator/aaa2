@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 
 interface LetterStaggerProps {
@@ -5,16 +6,20 @@ interface LetterStaggerProps {
   className?: string;
   delayBase?: number;
   staggerTime?: number;
+  align?: 'left' | 'center' | 'right';
 }
 
 export const LetterStagger: React.FC<LetterStaggerProps> = ({ 
   text, 
   className = "",
   delayBase = 0,
-  staggerTime = 30
+  staggerTime = 30,
+  align = 'center'
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const elementRef = useRef<HTMLSpanElement>(null);
+
+  const alignmentClass = align === 'left' ? 'justify-start' : align === 'right' ? 'justify-end' : 'justify-center';
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -42,7 +47,7 @@ export const LetterStagger: React.FC<LetterStaggerProps> = ({
   let charCount = 0;
 
   return (
-    <span ref={elementRef} className={`inline-flex flex-wrap justify-center gap-[0.25em] ${className}`}>
+    <span ref={elementRef} className={`inline-flex flex-wrap ${alignmentClass} gap-[0.25em] ${className}`}>
       {words.map((word, wordIndex) => (
         <span key={wordIndex} className="inline-block whitespace-nowrap">
           {word.split('').map((char, charIndex) => {

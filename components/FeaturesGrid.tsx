@@ -1,12 +1,12 @@
+
 import React from 'react';
 import { 
   Zap, 
-  Layers, 
   Users, 
   Palette, 
   Workflow, 
   MessageSquare,
-  Crown // Added Crown icon for "Editor Reconocido"
+  Crown 
 } from 'lucide-react';
 import { GlassCard } from './ui/GlassCard';
 import { FadeIn } from './ui/FadeIn';
@@ -18,7 +18,7 @@ const features = [
     desc: "Crea VFX y ediciones profesionales."
   },
   {
-    Icon: Crown, // Changed icon to represent prestige
+    Icon: Crown,
     title: "Sé un Editor Reconocido",
     desc: "Conviértete en el editor que todos conocen."
   },
@@ -60,7 +60,6 @@ export const FeaturesGrid: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {features.map((feature, index) => (
-            // REMOVED + 1000ms delay. Now it starts immediately (index * 50)
             <FadeIn key={index} delay={index * 50}>
               <GlassCard variant="glow-border" className="h-full group hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-500">
                 <div className="mb-4 relative w-16 h-16 flex items-center justify-center">

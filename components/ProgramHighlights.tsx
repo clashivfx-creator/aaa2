@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Video, Target, UsersRound, Package } from 'lucide-react';
 import { GlassCard } from './ui/GlassCard';
@@ -16,9 +17,7 @@ export const ProgramHighlights: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-            
             <FadeIn delay={0} className="h-full">
-              {/* Feedback Directo - Pink/Red theme */}
               <GlassCard hoverEffect className="flex flex-col items-center text-center py-8 px-6 h-full group !border-pink-500/20 bg-gradient-to-b from-pink-500/5 to-transparent hover:shadow-[0_0_30px_-5px_rgba(236,72,153,0.3)]">
                   <div className="mb-6 relative w-16 h-16 flex items-center justify-center">
                     <div className="absolute inset-0 rounded-xl bg-pink-500/10 blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500 animate-pulse" />
@@ -26,14 +25,12 @@ export const ProgramHighlights: React.FC = () => {
                        <Target className="w-7 h-7 text-pink-400 drop-shadow-[0_0_8px_rgba(236,72,153,0.5)]" />
                     </div>
                   </div>
-
                   <h3 className="text-xl font-bold mb-3 text-pink-100">Feedback Directo</h3>
                   <p className="text-gray-400 text-sm leading-relaxed group-hover:text-gray-300 transition-colors">Revisiones 1 a 1 de tus timelines para pulir esos detalles que marcan la diferencia.</p>
               </GlassCard>
             </FadeIn>
 
             <FadeIn delay={50} className="h-full">
-              {/* Llamadas Grupales - Purple/Indigo theme */}
               <GlassCard hoverEffect className="flex flex-col items-center text-center py-8 px-6 h-full group !border-indigo-500/20 bg-gradient-to-b from-indigo-500/5 to-transparent hover:shadow-[0_0_30px_-5px_rgba(99,102,241,0.3)]">
                   <div className="mb-6 relative w-16 h-16 flex items-center justify-center">
                     <div className="absolute inset-0 rounded-xl bg-indigo-500/10 blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500 animate-pulse" />
@@ -41,14 +38,12 @@ export const ProgramHighlights: React.FC = () => {
                        <Video className="w-7 h-7 text-indigo-400 drop-shadow-[0_0_8px_rgba(99,102,241,0.5)]" />
                     </div>
                   </div>
-
                   <h3 className="text-xl font-bold mb-3 text-indigo-100">Llamadas Grupales</h3>
                   <p className="text-gray-400 text-sm leading-relaxed group-hover:text-gray-300 transition-colors">Sesiones semanales en vivo. Q&A, networking y análisis de proyectos reales.</p>
               </GlassCard>
             </FadeIn>
 
             <FadeIn delay={100} className="h-full">
-              {/* Comunidad VIP - Orange/Amber theme */}
               <GlassCard hoverEffect className="flex flex-col items-center text-center py-8 px-6 h-full group !border-orange-500/20 bg-gradient-to-b from-orange-500/5 to-transparent hover:shadow-[0_0_30px_-5px_rgba(249,115,60,0.3)]">
                   <div className="mb-6 relative w-16 h-16 flex items-center justify-center">
                     <div className="absolute inset-0 rounded-xl bg-orange-500/10 blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500 animate-pulse" />
@@ -56,14 +51,12 @@ export const ProgramHighlights: React.FC = () => {
                        <UsersRound className="w-7 h-7 text-orange-400 drop-shadow-[0_0_8px_rgba(249,115,60,0.5)]" />
                     </div>
                   </div>
-
                   <h3 className="text-xl font-bold mb-3 text-orange-100">Comunidad VIP</h3>
                   <p className="text-gray-400 text-sm leading-relaxed group-hover:text-gray-300 transition-colors">Acceso exclusivo a un Discord privado con recursos, presets y ofertas laborales.</p>
               </GlassCard>
             </FadeIn>
 
             <FadeIn delay={150} className="h-full">
-              {/* Software y Presets - Emerald/Green theme */}
               <GlassCard hoverEffect className="flex flex-col items-center text-center py-8 px-6 h-full group !border-emerald-500/20 bg-gradient-to-b from-emerald-500/5 to-transparent hover:shadow-[0_0_30px_-5px_rgba(16,185,129,0.3)]">
                   <div className="mb-6 relative w-16 h-16 flex items-center justify-center">
                     <div className="absolute inset-0 rounded-xl bg-emerald-500/10 blur-xl opacity-0 group-hover:opacity-50 transition-opacity duration-500 animate-pulse" />
@@ -71,7 +64,6 @@ export const ProgramHighlights: React.FC = () => {
                        <Package className="w-7 h-7 text-emerald-400 drop-shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                     </div>
                   </div>
-
                   <h3 className="text-xl font-bold mb-3 text-emerald-100">Software y Presets</h3>
                   <p className="text-gray-400 text-sm leading-relaxed group-hover:text-gray-300 transition-colors">Incluye programas, plugins profesionales exclusivos y presets listos para usar.</p>
               </GlassCard>

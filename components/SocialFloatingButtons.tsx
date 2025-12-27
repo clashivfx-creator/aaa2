@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Instagram } from 'lucide-react';
 
@@ -14,7 +15,6 @@ const DiscordIcon = ({ className }: { className?: string }) => (
 export const SocialFloatingButtons = () => {
     return (
         <div className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 p-2 md:p-3 rounded-full bg-black/40 backdrop-blur-md border border-white/10 shadow-2xl flex flex-col gap-3 md:gap-4 items-center">
-             {/* Instagram */}
             <a 
                 href="https://www.instagram.com/clashivfx/" 
                 target="_blank" 
@@ -24,8 +24,6 @@ export const SocialFloatingButtons = () => {
             >
                  <Instagram className="w-4 h-4 md:w-6 md:h-6 text-white" />
             </a>
-
-            {/* TikTok */}
              <a 
                 href="https://www.tiktok.com/@clashivfx" 
                 target="_blank" 
@@ -35,8 +33,6 @@ export const SocialFloatingButtons = () => {
             >
                  <TikTokIcon className="w-3 h-3 md:w-5 md:h-5 text-white group-hover:text-[#00f2ea] transition-colors" />
             </a>
-
-            {/* Discord */}
              <a 
                 href="https://discord.com/invite/zEcFPBqy6s" 
                 target="_blank" 

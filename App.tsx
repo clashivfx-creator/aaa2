@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ShoppingBag } from 'lucide-react';
 import { Hero } from './components/Hero';
@@ -20,12 +21,11 @@ const DiscordIconNav = ({ className }: { className?: string }) => (
 
 function App() {
   return (
-    <div className="min-h-screen text-white relative">
+    <div className="min-h-screen text-white relative bg-black">
       <AnimatedBackground />
       <ScrollProgress />
       <SocialFloatingButtons />
       
-      {/* Navbar overlay with Logo and Buttons */}
       <nav className="fixed top-0 w-full z-50 px-4 md:px-8 py-4 flex justify-between items-center backdrop-blur-sm bg-black/10 border-b border-white/5 transition-all duration-300">
         <div className="flex items-center gap-2">
           <span className="text-lg font-bold tracking-widest uppercase text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">ClashiVFX</span>

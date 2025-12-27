@@ -1,5 +1,5 @@
 {
-  "name": "vfx-formación-elite",
+  "name": "clashivfx-formación-elite",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "lucide-react": "^0.561.0",
+    "lucide-react": "^0.562.0",
     "react-dom": "^19.2.3",
     "react": "^19.2.3"
   },
