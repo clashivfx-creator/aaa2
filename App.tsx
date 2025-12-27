@@ -1,7 +1,8 @@
 
-import React from 'react';
-import { ShoppingBag } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShoppingBag, ArrowDownCircle } from 'lucide-react';
 import { Hero } from './components/Hero';
+import { LimitedPacks } from './components/LimitedPacks';
 import { WarningSection } from './components/WarningSection';
 import { FeaturesGrid } from './components/FeaturesGrid';
 import { ProgramHighlights } from './components/ProgramHighlights';
@@ -20,11 +21,50 @@ const DiscordIconNav = ({ className }: { className?: string }) => (
 );
 
 function App() {
+  const [showPacksIndicator, setShowPacksIndicator] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show indicator when near top
+      const isTop = window.scrollY < 400;
+      setShowPacksIndicator(isTop);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToPacks = () => {
+    const packsSection = document.getElementById('packs');
+    if (packsSection) {
+      packsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
   return (
     <div className="min-h-screen text-white relative bg-black">
       <AnimatedBackground />
       <ScrollProgress />
       <SocialFloatingButtons />
+      
+      {/* Floating Limited Packs Indicator - EVEN LARGER AND MORE INTENSE */}
+      <div 
+        className={`fixed left-4 top-24 md:left-12 md:top-48 z-40 transition-all duration-700 transform ${showPacksIndicator ? 'translate-x-0 opacity-100 scale-100' : '-translate-x-full opacity-0 scale-90 pointer-events-none'}`}
+      >
+        <button 
+          onClick={scrollToPacks}
+          className="group flex items-center gap-5 px-8 py-5 md:px-14 md:py-8 rounded-full bg-red-600/40 hover:bg-red-600/60 border-2 border-red-500 backdrop-blur-3xl transition-all shadow-[0_0_50px_rgba(239,68,68,0.5)] hover:shadow-red-500/70 animate-intense-alert"
+        >
+          <div className="relative flex h-5 w-5 md:h-8 md:w-8">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-90"></span>
+            <span className="relative inline-flex rounded-full h-full w-full bg-red-600 shadow-inner"></span>
+          </div>
+          <div className="flex flex-col items-start">
+            <span className="text-sm md:text-2xl font-black uppercase tracking-tighter text-white drop-shadow-2xl">Packs Limitados</span>
+            <span className="text-[10px] md:text-xs font-bold text-red-100 uppercase opacity-90 tracking-[0.2em] hidden md:block">¡OFERTA ÚNICA IRREPETIBLE!</span>
+          </div>
+          <ArrowDownCircle className="w-6 h-6 md:w-10 md:h-10 text-white animate-bounce ml-3" />
+        </button>
+      </div>
       
       <nav className="fixed top-0 w-full z-50 px-4 md:px-8 py-4 flex justify-between items-center backdrop-blur-sm bg-black/10 border-b border-white/5 transition-all duration-300">
         <div className="flex items-center gap-2">
@@ -62,6 +102,7 @@ function App() {
         <ProgramHighlights />
         <CreatorStory />
         <CreatorsSection />
+        <LimitedPacks />
       </main>
 
       <Footer />

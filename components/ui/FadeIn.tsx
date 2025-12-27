@@ -12,7 +12,7 @@ export const FadeIn: React.FC<FadeInProps> = ({
   children, 
   className = "", 
   delay = 0,
-  threshold = 0.1 
+  threshold = 0.1
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
