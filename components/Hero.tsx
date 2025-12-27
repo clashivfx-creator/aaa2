@@ -72,60 +72,69 @@ export const Hero: React.FC = () => {
             </FadeIn>
           </div>
 
-          {/* Right Column: VFX Pack Promo Card with Rainbow Glow & Autoplay Video */}
+          {/* Right Column: VFX Pack Promo Card with Refined Rainbow Glow & Autoplay Video */}
           <FadeIn delay={1300} className="w-full max-w-sm lg:max-w-md shrink-0">
-            <div className="relative p-[2px] rounded-3xl overflow-hidden group shadow-[0_0_50px_-10px_rgba(255,255,255,0.1)] hover:shadow-[0_0_70px_-10px_rgba(168,85,247,0.4)] transition-all duration-500">
-              {/* This is the rainbow glowing border background */}
-              <div className="absolute inset-0 rainbow-card-border opacity-70 group-hover:opacity-100 transition-opacity blur-[2px]" />
+            <div className="relative p-[3px] rounded-3xl group transition-all duration-700">
+              {/* BLOOM GLOW LAYER 1: Subtler deep wide glow */}
+              <div className="absolute -inset-6 rainbow-card-border opacity-20 blur-2xl group-hover:opacity-40 group-hover:blur-3xl transition-all duration-700 pointer-events-none" />
               
-              <GlassCard className="!bg-[#070708] !border-none !rounded-[22px] p-6 md:p-8 relative z-10 h-full flex flex-col">
-                <div className="mb-6">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-5 h-5 text-yellow-400 animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]" />
-                    <span className="text-[14px] md:text-[16px] font-black tracking-[0.25em] text-yellow-400 uppercase animate-flash-glow">Oferta Exclusiva</span>
+              {/* BLOOM GLOW LAYER 2: Subtler closer glow */}
+              <div className="absolute -inset-1 rainbow-card-border opacity-30 blur-lg group-hover:opacity-60 transition-all duration-500 pointer-events-none" />
+              
+              {/* MAIN CONTAINER */}
+              <div className="relative overflow-hidden rounded-[26px] z-10 h-full flex flex-col">
+                {/* Internal rainbow border background */}
+                <div className="absolute inset-0 rainbow-card-border opacity-100" />
+                
+                <GlassCard className="!bg-[#070708] !border-none !rounded-[22px] m-[1.5px] p-6 md:p-8 relative z-20 h-full flex flex-col">
+                  <div className="mb-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles className="w-5 h-5 text-yellow-400 animate-pulse drop-shadow-[0_0_8px_rgba(234,179,8,0.8)]" />
+                      <span className="text-[14px] md:text-[16px] font-black tracking-[0.25em] text-yellow-400 uppercase animate-flash-glow">Oferta Exclusiva</span>
+                    </div>
+                    <h3 className="text-3xl font-extrabold tracking-tight text-white mb-0 leading-none">
+                      PACK AVANZADO <span className="text-vfx-gold">VFX</span>
+                    </h3>
+                    <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mt-2">
+                      EFECTOS CON 1 CLIC
+                    </p>
                   </div>
-                  <h3 className="text-3xl font-extrabold tracking-tight text-white mb-0 leading-none">
-                    PACK AVANZADO <span className="text-gradient">VFX</span>
-                  </h3>
-                  <p className="text-xs font-medium text-gray-400 uppercase tracking-widest mt-2">
-                    EFECTOS CON 1 CLIC
-                  </p>
-                </div>
 
-                {/* YouTube Shorts Embed - Updated for Autoplay, Muted, Loop */}
-                <div className="relative aspect-[9/16] w-full bg-black rounded-xl overflow-hidden border border-white/5 shadow-2xl group-hover:border-white/20 transition-all">
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src="https://www.youtube.com/embed/aZVKFvUX1ns?autoplay=1&mute=1&loop=1&playlist=aZVKFvUX1ns&controls=0&modestbranding=1&rel=0&showinfo=0"
-                    title="VFX Pack Preview"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowFullScreen
-                    className="w-full h-full object-cover pointer-events-none"
-                  ></iframe>
-                  
-                  {/* Overlay gradient for depth */}
-                  <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
-                </div>
+                  {/* YouTube Embed - Square aspect ratio */}
+                  <div className="relative aspect-square w-full bg-black rounded-xl overflow-hidden border border-white/5 shadow-2xl group-hover:border-white/20 transition-all">
+                    <iframe
+                      width="100%"
+                      height="100%"
+                      src="https://www.youtube.com/embed/aZVKFvUX1ns?autoplay=1&mute=1&loop=1&playlist=aZVKFvUX1ns&controls=0&modestbranding=1&rel=0&showinfo=0"
+                      title="VFX Pack Preview"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      allowFullScreen
+                      className="w-full h-full object-cover pointer-events-none"
+                    ></iframe>
+                    
+                    {/* Overlay gradient for depth */}
+                    <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                  </div>
 
-                <div className="mt-6">
-                  <a 
-                    href="https://e08ff1-xx.myshopify.com/products/pack-de-efectos-esenciales" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="block w-full"
-                  >
-                    <button className="w-full flex items-center justify-center gap-3 px-6 py-5 rounded-xl text-white font-black text-sm md:text-base uppercase tracking-tighter rainbow-btn shadow-lg group/btn">
-                      <ShoppingCart className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
-                      CONSEGUIR AHORA
-                    </button>
-                  </a>
-                  <p className="text-[10px] text-center text-gray-500 mt-4 font-medium uppercase tracking-widest">
-                    Acceso instantáneo • Plugins incluidos
-                  </p>
-                </div>
-              </GlassCard>
+                  <div className="mt-6">
+                    <a 
+                      href="https://e08ff1-xx.myshopify.com/products/pack-de-efectos-esenciales" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="block w-full"
+                    >
+                      <button className="w-full flex items-center justify-center gap-3 px-6 py-5 rounded-xl text-white font-black text-sm md:text-base uppercase tracking-tighter rainbow-btn shadow-lg group/btn">
+                        <ShoppingCart className="w-5 h-5 group-hover/btn:scale-110 transition-transform" />
+                        CONSEGUIR AHORA
+                      </button>
+                    </a>
+                    <p className="text-[10px] text-center text-gray-500 mt-4 font-medium uppercase tracking-widest">
+                      Acceso instantáneo • Plugins incluidos
+                    </p>
+                  </div>
+                </GlassCard>
+              </div>
             </div>
           </FadeIn>
 
