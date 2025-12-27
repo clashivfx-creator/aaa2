@@ -166,6 +166,36 @@
         animation: rainbow-border 8s ease infinite;
       }
 
+      .gold-card-border {
+        background: linear-gradient(
+          45deg,
+          #BF953F, #FCF6BA, #FFFFFF, #FCF6BA, #AA771C, #BF953F
+        );
+        background-size: 400% 400%;
+        animation: rainbow-border 6s linear infinite;
+      }
+
+      .gold-white-btn {
+        background: linear-gradient(
+          110deg,
+          #BF953F 0%,
+          #FCF6BA 25%,
+          #FFFFFF 50%,
+          #FCF6BA 75%,
+          #BF953F 100%
+        );
+        background-size: 200% auto;
+        animation: textShine 3s linear infinite;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+      }
+
+      .gold-white-btn:hover {
+        transform: scale(1.05) translateY(-2px);
+        box-shadow: 0 0 30px rgba(191, 149, 63, 0.6);
+        filter: brightness(1.1);
+      }
+
       .rainbow-btn {
         background: linear-gradient(
           120deg,
@@ -208,6 +238,15 @@
 
       .animate-pulse-glow {
         animation: pulse-glow 2.5s infinite ease-in-out;
+      }
+
+      @keyframes pulse-glow-gold {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(191, 149, 63, 0.4); filter: brightness(1); }
+        50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(191, 149, 63, 0.7); filter: brightness(1.1); }
+      }
+
+      .animate-pulse-glow-gold {
+        animation: pulse-glow-gold 2.5s infinite ease-in-out;
       }
 
       @keyframes pulse-glow-blue {
