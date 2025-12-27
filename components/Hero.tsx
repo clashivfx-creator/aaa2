@@ -56,7 +56,7 @@ export const Hero: React.FC = () => {
                 <button className="relative z-10 w-full text-lg md:text-2xl px-12 py-6 rounded-full font-black text-black uppercase tracking-tighter gold-white-btn flex items-center justify-center gap-3 shadow-2xl overflow-hidden group">
                   <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
                   <span className="relative z-10 flex items-center gap-2">
-                    ENTRAR A LA FORMACION
+                    VER FORMACIÓN
                     <ArrowRight className="w-7 h-7 group-hover:translate-x-1.5 transition-transform" />
                   </span>
                 </button>

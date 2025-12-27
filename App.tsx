@@ -21,16 +21,25 @@ const DiscordIconNav = ({ className }: { className?: string }) => (
 );
 
 function App() {
-  const [showPacksIndicator, setShowPacksIndicator] = useState(true);
+  // Inicializamos en false para permitir la animación de entrada al cargar
+  const [showPacksIndicator, setShowPacksIndicator] = useState(false);
 
   useEffect(() => {
+    // Retraso de entrada al cargar para que sea visible
+    const entryTimer = setTimeout(() => {
+      setShowPacksIndicator(true);
+    }, 600);
+
     const handleScroll = () => {
-      // Show indicator when near top
       const isTop = window.scrollY < 400;
       setShowPacksIndicator(isTop);
     };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(entryTimer);
+    };
   }, []);
 
   const scrollToPacks = () => {
@@ -46,9 +55,9 @@ function App() {
       <ScrollProgress />
       <SocialFloatingButtons />
       
-      {/* Floating Limited Packs Indicator - EVEN LARGER AND MORE INTENSE */}
+      {/* Floating Limited Packs Indicator - ELEGANT ENTRY FROM LEFT WITH CORRECT BEZIER SYNTAX */}
       <div 
-        className={`fixed left-4 top-24 md:left-12 md:top-48 z-40 transition-all duration-700 transform ${showPacksIndicator ? 'translate-x-0 opacity-100 scale-100' : '-translate-x-full opacity-0 scale-90 pointer-events-none'}`}
+        className={`fixed left-4 top-24 md:left-12 md:top-48 z-40 transition-all duration-1000 transform [transition-timing-function:cubic-bezier(0.23,1,0.32,1)] ${showPacksIndicator ? 'translate-x-0 opacity-100 scale-100' : '-translate-x-[150%] opacity-0 scale-90 pointer-events-none'}`}
       >
         <button 
           onClick={scrollToPacks}
