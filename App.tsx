@@ -21,14 +21,14 @@ const DiscordIconNav = ({ className }: { className?: string }) => (
 );
 
 function App() {
-  // Inicializamos en false para permitir la animación de entrada al cargar
+  // Inicializamos en false pero activamos la animación inmediatamente en useEffect
   const [showPacksIndicator, setShowPacksIndicator] = useState(false);
 
   useEffect(() => {
-    // Retraso de entrada al cargar para que sea visible
-    const entryTimer = setTimeout(() => {
+    // Animación de entrada inmediata al cargar
+    requestAnimationFrame(() => {
       setShowPacksIndicator(true);
-    }, 600);
+    });
 
     const handleScroll = () => {
       const isTop = window.scrollY < 400;
@@ -38,7 +38,6 @@ function App() {
     window.addEventListener('scroll', handleScroll);
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      clearTimeout(entryTimer);
     };
   }, []);
 
@@ -55,23 +54,23 @@ function App() {
       <ScrollProgress />
       <SocialFloatingButtons />
       
-      {/* Floating Limited Packs Indicator - ELEGANT ENTRY FROM LEFT WITH CORRECT BEZIER SYNTAX */}
+      {/* Floating Limited Packs Indicator - COMPACT ON MOBILE TO AVOID COVERING HERO TEXT */}
       <div 
-        className={`fixed left-4 top-24 md:left-12 md:top-48 z-40 transition-all duration-1000 transform [transition-timing-function:cubic-bezier(0.23,1,0.32,1)] ${showPacksIndicator ? 'translate-x-0 opacity-100 scale-100' : '-translate-x-[150%] opacity-0 scale-90 pointer-events-none'}`}
+        className={`fixed left-2 top-20 md:left-12 md:top-48 z-40 transition-all duration-1000 transform [transition-timing-function:cubic-bezier(0.23,1,0.32,1)] ${showPacksIndicator ? 'translate-x-0 opacity-100 scale-100' : '-translate-x-[150%] opacity-0 scale-90 pointer-events-none'}`}
       >
         <button 
           onClick={scrollToPacks}
-          className="group flex items-center gap-5 px-8 py-5 md:px-14 md:py-8 rounded-full bg-red-600/40 hover:bg-red-600/60 border-2 border-red-500 backdrop-blur-3xl transition-all shadow-[0_0_50px_rgba(239,68,68,0.5)] hover:shadow-red-500/70 animate-intense-alert"
+          className="group flex items-center gap-2 md:gap-5 px-4 py-3 md:px-14 md:py-8 rounded-full bg-red-600/40 hover:bg-red-600/60 border-2 border-red-500 backdrop-blur-3xl transition-all shadow-[0_0_30px_rgba(239,68,68,0.4)] md:shadow-[0_0_50px_rgba(239,68,68,0.5)] hover:shadow-red-500/70 animate-intense-alert"
         >
-          <div className="relative flex h-5 w-5 md:h-8 md:w-8">
+          <div className="relative flex h-3 w-3 md:h-8 md:w-8 shrink-0">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-90"></span>
             <span className="relative inline-flex rounded-full h-full w-full bg-red-600 shadow-inner"></span>
           </div>
-          <div className="flex flex-col items-start">
-            <span className="text-sm md:text-2xl font-black uppercase tracking-tighter text-white drop-shadow-2xl">Packs Limitados</span>
-            <span className="text-[10px] md:text-xs font-bold text-red-100 uppercase opacity-90 tracking-[0.2em] hidden md:block">¡OFERTA ÚNICA IRREPETIBLE!</span>
+          <div className="flex flex-col items-start overflow-hidden">
+            <span className="text-[10px] md:text-2xl font-black uppercase tracking-tighter text-white drop-shadow-2xl whitespace-nowrap">Packs Limitados</span>
+            <span className="text-[8px] md:text-xs font-bold text-red-100 uppercase opacity-90 tracking-[0.1em] md:tracking-[0.2em] hidden md:block">¡OFERTA ÚNICA IRREPETIBLE!</span>
           </div>
-          <ArrowDownCircle className="w-6 h-6 md:w-10 md:h-10 text-white animate-bounce ml-3" />
+          <ArrowDownCircle className="w-4 h-4 md:w-10 md:h-10 text-white animate-bounce ml-1 md:ml-3 shrink-0" />
         </button>
       </div>
       
