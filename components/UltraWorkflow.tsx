@@ -9,45 +9,40 @@ import {
 } from 'lucide-react';
 import { LanguageContext } from '../App';
 
-// Componente para cargar videos de forma inteligente
+// Componente para cargar videos de forma inteligente y fluida
 const LazyVideo = ({ src, className, aspect }: { src: string, className?: string, aspect?: string }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [isIntersecting, setIntersecting] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [shouldLoad, setShouldLoad] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIntersecting(entry.isIntersecting);
+        if (entry.isIntersecting) {
+          setShouldLoad(true);
+          observer.disconnect(); // Una vez que carga, se queda cargado para evitar parpadeos
+        }
       },
-      { threshold: 0.1, rootMargin: '200px' }
+      { threshold: 0.01, rootMargin: '400px' } // Carga con anticipación
     );
 
-    if (videoRef.current) observer.observe(videoRef.current);
+    if (containerRef.current) observer.observe(containerRef.current);
     return () => observer.disconnect();
   }, []);
 
-  useEffect(() => {
-    if (videoRef.current) {
-      if (isIntersecting) {
-        videoRef.current.play().catch(() => {});
-      } else {
-        videoRef.current.pause();
-      }
-    }
-  }, [isIntersecting]);
-
   return (
-    <div className={`relative overflow-hidden ${aspect || 'aspect-video'} ${className}`}>
-      <video 
-        ref={videoRef}
-        muted 
-        loop 
-        playsInline 
-        className="w-full h-full object-cover will-change-transform transform-gpu"
-        preload="none"
-      >
-        {isIntersecting && <source src={src} type="video/mp4" />}
-      </video>
+    <div ref={containerRef} className={`relative overflow-hidden ${aspect || 'aspect-video'} ${className} bg-white/5`}>
+      {shouldLoad ? (
+        <video 
+          autoPlay 
+          muted 
+          loop 
+          playsInline 
+          className="w-full h-full object-cover will-change-transform transform-gpu"
+          src={src}
+        />
+      ) : (
+        <div className="w-full h-full bg-black/20 animate-pulse" />
+      )}
       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
     </div>
   );
@@ -86,7 +81,7 @@ const SectionText = React.memo(({ number, title, desc, isHovered, align = 'left'
 
   return (
     <div className={`flex flex-col justify-center max-w-md transition-all duration-500 cubic-bezier(0.16, 1, 0.3, 1) relative transform-gpu
-      ${isHovered ? (align === 'left' ? 'lg:-translate-x-8 lg:scale-105 z-[70]' : 'lg:translate-x-8 lg:scale-105 z-[70]') : 'translate-x-0 z-10'}
+      ${isHovered ? (align === 'left' ? 'lg:-translate-x-8 lg:scale-105 lg:z-[70] z-10' : 'lg:translate-x-8 lg:scale-105 lg:z-[70] z-10') : 'translate-x-0 z-10'}
     `}>
       <span className="text-purple-500 font-bold text-xs sm:text-sm tracking-widest mb-2 sm:mb-4 opacity-70 uppercase">{number}</span>
       <h3 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4 sm:mb-6 leading-tight text-left">
@@ -130,12 +125,12 @@ const VideoContainer = ({
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
       className={`relative group p-[1px] rounded-[1.5rem] sm:rounded-[2.5rem] origin-center transition-all duration-500 cubic-bezier(0.16, 1, 0.3, 1) transform-gpu
-        ${!noZoom && isHovered ? `lg:scale-[1.15] ${translation} z-[100] shadow-[0_30px_100px_rgba(0,0,0,0.8)]` : 'z-10 scale-100 translate-x-0'}
+        ${!noZoom && isHovered ? `lg:scale-[1.15] ${translation} lg:z-[100] z-10 lg:shadow-[0_30px_100px_rgba(0,0,0,0.8)]` : 'z-10 scale-100 translate-x-0'}
         ${className}
       `}
     >
       {!noZoom && (
-        <div className={`absolute -inset-4 sm:-inset-10 bg-purple-500/5 blur-[20px] rounded-full transition-opacity duration-500 pointer-events-none ${isHovered ? 'opacity-100' : 'opacity-0'}`} />
+        <div className={`absolute -inset-4 sm:-inset-10 bg-purple-500/5 blur-[20px] rounded-full transition-opacity duration-500 pointer-events-none ${isHovered ? 'lg:opacity-100 opacity-0' : 'opacity-0'}`} />
       )}
       
       <div className={`relative z-10 bg-[#050505] rounded-[1.45rem] sm:rounded-[2.45rem] overflow-hidden border border-white/10 shadow-2xl transition-all duration-500 group-hover:border-purple-500/40 transform-gpu`}>
@@ -151,12 +146,13 @@ export const UltraWorkflow: React.FC = () => {
   const featuresHeaderRef = useRef<HTMLDivElement>(null);
   const shopifyUrl = "https://e08ff1-xx.myshopify.com/products/pack-avanzado-copia-1";
 
-  const curvesVideo = "https://cdn.discordapp.com/attachments/1393659131549978666/1463344913771925504/video_nashhh_5.mp4?ex=697377e7&is=69722667&hm=ab02160bde3daafae1894a774d68f940efc0d6eaafd0f531ef8533ea0a9a6337&";
-  const layersVideo = "https://cdn.discordapp.com/attachments/1393659131549978666/1463347243749740554/perf.mp4?ex=69737a12&is=69722892&hm=c2d5757faea731a3c1f4cc2a5434a119c8f65fd99c7bfa65eabb4071c1ca60b0&";
-  const optimizeVideo = "https://cdn.discordapp.com/attachments/1393659131549978666/1463350670634778666/BOTON_OPTIMIZAR.mp4?ex=69737d43&is=69722bc3&hm=c8b6a63a9bd913e1da881adc2d1c8a6293243f1c77416443cc0de972cb425fc1&";
-  const moreFeaturesVideo = "https://cdn.discordapp.com/attachments/1393659131549978666/1463672404940296246/MAS_FUNCIONES.mp4?ex=6972aea7&is=69715d27&hm=0b6889bb806eb976ccb6f8b1f138a0d2414f01c23e9139e87f47e9ff242ead2d&";
-  const searchBarVideo = "https://cdn.discordapp.com/attachments/1393659131549978666/1463680890063556770/BARRA_DE_BUSQUEDA.mp4?ex=6972b68e&is=6971650e&hm=914cbfc57d7d23945034f1e473ffcff48f20a042f4baa9930f83273e5302aacd&";
-  const mainVideoUrl = "https://cdn.discordapp.com/attachments/1393659131549978666/1463720099583103110/presetnacion_final_1_1.mp4?ex=6972db12&is=69718992&hm=f4ac13a946e251d79f8742a02c1737251fb272a41edc19c84ac225a98aebe9b5&";
+  // Enlaces permanentes de Cloudinary
+  const layersVideo = "https://res.cloudinary.com/dbu9kzomq/video/upload/v1769186132/PERFORMANCE_ecytm6.mp4";
+  const curvesVideo = "https://res.cloudinary.com/dbu9kzomq/video/upload/v1769186123/curvas_szgnwo.mp4";
+  const optimizeVideo = "https://res.cloudinary.com/dbu9kzomq/video/upload/v1769186098/BOTON_OPTIMIZAR_to4df3.mp4";
+  const searchBarVideo = "https://res.cloudinary.com/dbu9kzomq/video/upload/v1769186099/BARRA_DE_BUSQUEDA_sfxmct.mp4";
+  const moreFeaturesVideo = "https://res.cloudinary.com/dbu9kzomq/video/upload/v1769186125/MAS_FUNCIONES_xldvk9.mp4";
+  const mainVideoUrl = "https://res.cloudinary.com/dbu9kzomq/video/upload/v1769186159/VIDEO_PRINCIAL_AL_LADO_DEL_PRECIO_auh5rv.mp4";
 
   const videoAspect = "aspect-[1366/766]";
 

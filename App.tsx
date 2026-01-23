@@ -204,7 +204,8 @@ const translations = {
 
 const App = () => {
   const [lang, setLang] = useState<'es' | 'en'>('es');
-  const [view, setView] = useState<ViewType>('workflow');
+  // Se cambió el estado inicial de 'workflow' a 'formation'
+  const [view, setView] = useState<ViewType>('formation');
 
   const t = (key: string) => {
     return (translations[lang] as any)[key] || key;
