@@ -204,8 +204,8 @@ const translations = {
 
 const App = () => {
   const [lang, setLang] = useState<'es' | 'en'>('es');
-  // Se cambió el estado inicial de 'workflow' a 'formation'
-  const [view, setView] = useState<ViewType>('formation');
+  // Se cambió el estado inicial de 'formation' a 'workflow' para que cargue directamente ULTRAWORKFLOW
+  const [view, setView] = useState<ViewType>('workflow');
 
   const t = (key: string) => {
     return (translations[lang] as any)[key] || key;
